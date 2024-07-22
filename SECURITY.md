@@ -11,7 +11,7 @@ Here are the versions of Stream Sprout currently being supported with security u
 
 ## Reporting a Vulnerability
 
-If you discover a vulnerability then [file an issue](https://github.com/wimpys-world/stream-sprout/issues/new) and click *Report a vulnerability*.
+If you discover a vulnerability then [file an issue](https://github.com/wimpysworld/stream-sprout/issues/new) and click *Report a vulnerability*.
 
 - Stream Sprout is a spare-time hobby project.
 - We do not have SLAs for responding to security issues.

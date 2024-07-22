@@ -34,7 +34,7 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Re-stream a video source to multiple destinations such as Twitch, YouTube, and Owncast.";
-    homepage = "https://github.com/wimpys-world/stream-sprout";
+    homepage = "https://github.com/wimpysworld/stream-sprout";
     mainProgram = "stream-sprout";
     license = lib.licenses.asl20;
     maintainers = with lib.maintainers; [ flexiondotorg ];
