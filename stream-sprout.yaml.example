@@ -1,0 +1,18 @@
+server:
+  url: "rtmp://127.0.0.1:1935"
+  archive_stream: false
+  archive_path: "${HOME}/Streams"
+
+services:
+  trovo:
+    enabled: false
+    rtmp_server: "rtmp://livepush.trovo.live/live/"
+    key: "<your_stream_key>"
+  twitch:
+    enabled: true
+    rtmp_server: "rtmp://live.twitch.tv/app/"
+    key: "<your_stream_key>"
+  youtube:
+    enabled: true
+    rtmp_server: "rtmp://a.rtmp.youtube.com/live2/"
+    key: "<your_stream_key>"

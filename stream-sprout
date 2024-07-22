@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+
+readonly STREAM_SPROUT_YAML="stream-sprout.yaml"
+readonly VERSION="0.1.0"
+
+function ctrl_c() {
+    echo " - Trapped: CTRL-C"
+    pkill ffmpeg
+    rename_archive
+    exit
+}
+
+function get_archive_path() {
+    local ARCHIVE_PATH=""
+    ARCHIVE_PATH=$(yq e ".server.archive_path" "${STREAM_SPROUT_CONFIG}")
+    # Expand any environment variables in the path
+    ARCHIVE_PATH=$(eval echo "${ARCHIVE_PATH}")
+    if [ -z "${ARCHIVE_PATH}" ]; then
+        echo "./"
+    else
+        mkdir -p "${ARCHIVE_PATH}" 2> /dev/null
+        echo "${ARCHIVE_PATH}"
+    fi
+}
+
+function rename_archive() {
+    local STAMP=""
+    # If there is a stream file, then rename it to the current date and time
+    if [ -e "${ARCHIVE_PATH}/${ARCHIVE_TEMP}" ]; then
+        STAMP=$(date +%Y%m%d_%H%M%S)
+        echo " - Rename:  ${ARCHIVE_PATH}/${ARCHIVE_TEMP} to ${ARCHIVE_PATH}/stream-sprout-${STAMP}.mkv"
+        mv "${ARCHIVE_PATH}/${ARCHIVE_TEMP}" "${ARCHIVE_PATH}/stream-sprout-${STAMP}.mkv"
+    fi
+}
+
+function add_archive() {
+    local ARCHIVE_ENABLED=""
+    ARCHIVE_PATH="$(get_archive_path)"
+    ARCHIVE_TEMP="stream-temp-$(date +%s%N).mkv"
+
+    # Check if recording is enabled in the YAML configuration
+    ARCHIVE_ENABLED=$(yq e ".server.archive_stream" "${STREAM_SPROUT_CONFIG}")
+    if [[ "${ARCHIVE_ENABLED,,}" == "true" || "${ARCHIVE_ENABLED}" == "1" ]]; then
+        echo " - Archive: ${ARCHIVE_PATH}/${ARCHIVE_TEMP}"
+        if [ -n "${STREAM_TEE}" ]; then
+            STREAM_TEE+="|"
+        fi
+        STREAM_TEE+="[f=matroska]${ARCHIVE_PATH}/${ARCHIVE_TEMP}"
+    fi
+}
+
+function add_service() {
+    local URI="${1}"
+    if [ -n "${URI}" ]; then
+        if [ -n "${STREAM_TEE}" ]; then
+            STREAM_TEE+="|"
+        fi
+        # Using the onfail option will allow the other streams to continue if one fails.
+        STREAM_TEE+="[f=flv:onfail=ignore]${URI}"
+    fi
+}
+
+function get_stream_tee() {
+    local SERVICE_ENABLED=""
+    local SERVICES=""
+    local URI=""
+
+    # Extract services from the YAML
+    SERVICES=$(yq e '.services | keys | .[]' "${STREAM_SPROUT_CONFIG}")
+
+    # Iterate over each service
+    for SERVICE in ${SERVICES}; do
+        # Check if the service is enabled in the YAML configuration
+        SERVICE_ENABLED=$(yq e ".services.${SERVICE}.enabled" "${STREAM_SPROUT_CONFIG}")
+        if [[ "${SERVICE_ENABLED,,}" == "true" || "${SERVICE_ENABLED}" == "1" ]]; then
+            echo " - Service: ${SERVICE}"
+            URI=$(yq e ".services.${SERVICE}.rtmp_server" "${STREAM_SPROUT_CONFIG}")
+            if [[ ! "${URI}" =~ ^rtmp://.* ]]; then
+                echo " - Invalid URL:  ${SERVICE} is not a valid RTMP URL."
+                return
+            fi
+            URI+=$(yq e ".services.${SERVICE}.key" "${STREAM_SPROUT_CONFIG}")
+            add_service "${URI}"
+        fi
+    done
+    add_archive
+}
+
+# Check that ffmpeg and yq are available on the PATH
+for CMD in ffmpeg pkill yq; do
+    if ! command -v "${CMD}" &> /dev/null; then
+        echo "ERROR! ${CMD} is not installed. Exiting."
+        exit 1
+    fi
+done
+
+# Check in the current working directory
+if [ -f "./${STREAM_SPROUT_YAML}" ]; then
+    STREAM_SPROUT_CONFIG="./${STREAM_SPROUT_YAML}"
+# Check in the user's home directory, considering XDG on Linux and compatibility with macOS
+elif [ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/${STREAM_SPROUT_YAML}" ]; then
+    STREAM_SPROUT_CONFIG="${XDG_CONFIG_HOME:-${HOME}/.config}/${STREAM_SPROUT_YAML}"
+# Check in /etc
+elif [ -f "/etc/${STREAM_SPROUT_YAML}" ]; then
+    STREAM_SPROUT_CONFIG="/etc/${STREAM_SPROUT_YAML}"
+else
+    echo "ERROR: ${STREAM_SPROUT_YAML} was not found."
+    exit 1
+fi
+
+# Check if the file is valid YAML
+if ! yq eval '.' "${STREAM_SPROUT_CONFIG}" &>/dev/null; then
+    echo "ERROR: ${STREAM_SPROUT_CONFIG} is not valid YAML."
+    exit 1
+fi
+
+# trap ctrl-c and call ctrl_c() to clean up
+trap ctrl_c INT
+
+while true; do
+    echo "Stream Sprout v${VERSION} using ${STREAM_SPROUT_CONFIG}"
+    SERVER_URL=$(yq e ".server.url" "${STREAM_SPROUT_CONFIG}")
+    if [[ ! "${SERVER_URL}" =~ ^rtmp://.* ]]; then
+        echo " - Invalid URL:  ${SERVER_URL} is not a valid RTMP URL."
+        exit 1
+    fi
+    echo " - Server:  ${SERVER_URL}"
+    STREAM_TEE=""
+    get_stream_tee
+    ffmpeg \
+        -hide_banner \
+        -flags +global_header \
+        -fflags nobuffer \
+        -listen 1 -i "${SERVER_URL}?rtmp_buffer=0&rtmp_live=live" \
+        -flvflags no_duration_filesize \
+        -c:v copy -c:a copy -map 0 \
+        -movflags +faststart \
+        -f tee -use_fifo 1 "${STREAM_TEE}" 2>/dev/null
+    echo " - Server:  Stopping..."
+    rename_archive
+    echo
+done
