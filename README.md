@@ -100,6 +100,10 @@ Stream Sprout will look for a configuration file in the following locations, in 
 ### Server
 
 The `server:` section is used to configure the RTMP server that Stream Sprout will listen on.
+`url:` is the URL that Stream Sprout will listen on; it must be an RTMP URL.
+If you remotely host Stream Sprout, you should set `key:` to a secure value to prevent unauthorised access.
+
+```yaml
 If `archive_stream:` is `true` Stream Sprout will archive the stream to disk in the directory specified by `archive_path:`.
 
 ### Services
@@ -173,6 +177,9 @@ services:
 - Select `Custom` from the `Service` dropdown
 - Copy the server `url:` from your Stream Sprout configuration to the `Server` field:
   - `rtmp://127.0.0.1:1935` (*default*)
+- Copy the `key:` (if you specified one) from your Stream Sprout configuration to the `Stream Key` field
+
+![OBS Studio Stream Settings](.github/obs-settings.png)
 
 ## Limitations
 

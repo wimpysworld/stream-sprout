@@ -1,5 +1,6 @@
 server:
   url: "rtmp://127.0.0.1:1935"
+  key: "<insert your own key here>"
   archive_stream: false
   archive_path: "${HOME}/Streams"
 
