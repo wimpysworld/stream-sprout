@@ -5,9 +5,9 @@ Maintainer: Martin Wimpress <code@wimpress.io>
 Build-Depends:
  debhelper-compat (= 12),
 Standards-Version: 4.5.1
-Homepage: https://github.com/wimpys-world/stream-sprout
-Vcs-Browser: https://github.com/wimpys-world/stream-sprout
-Vcs-Git: https://github.com/wimpys-world/stream-sprout.git
+Homepage: https://github.com/wimpysworld/stream-sprout
+Vcs-Browser: https://github.com/wimpysworld/stream-sprout
+Vcs-Git: https://github.com/wimpysworld/stream-sprout.git
 Rules-Requires-Root: no
 
 Package: stream-sprout
@@ -19,7 +19,20 @@ Depends:
  yq,
  ${misc:Depends},
  ${shlibs:Depends},
-Description: Restream a video source to multiple destinations such as Twitch, YouTube, and Owncast.
- Stream Sprout uses FFmpeg to re-stream a video source to multiple destinations
- such as Twitch, YouTube, and Owncast.
+Description: Restream a video source to multiple destinations such as Twitch, YouTube, Owncast and Peertube.
+ Stream Sprout is a simple, self-contained, and easy-to-use solution for
+ streaming to multiple destinations such as Twitch, YouTube, Owncast and Peertube
  .
+ It uses FFmpeg to receive the video stream from OBS Studio (or anything that
+ can publish a RTMP stream) and then restreams it to multiple destinations;
+ providing similar functionality as services like Restream.io and Livepush.io
+ but without the need to pay for a third-party service or run something like
+ nginx with the RTMP module.
+ .
+ Stream Sprout is configured with a simple YAML file and designed to be run on
+ the same computer as your OBS Studio instance (it can be run remotely too) and
+ does not require root privileges.
+ .
+ There is no transcoding or processing of the video stream. The stream is
+ received and then restreamed to the destinations you configure without
+ modification. Optionally you can also archive the stream to disk.

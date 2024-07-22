@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: stream-sprout
 Upstream-Contact: Martin Wimpress <code@wimpress.io>
-Source: https://github.com/wimpys-world/stream-sprout
+Source: https://github.com/wimpysworld/stream-sprout
 
 Files: *
 Copyright: 2024 Martin Wimpress <code@wimpress.io>
