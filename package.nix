@@ -4,7 +4,7 @@
 , stdenv
 , ffmpeg-headless
 , procps
-, yq-go
+, yq
 }:
 let
   runtimePaths = [
