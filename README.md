@@ -26,7 +26,7 @@ There is no transcoding or processing of the video stream 🎞️
 The stream is received and then restreamed to the destinations you configure without modification.
 Optionally you can also archive the stream to disk 💾
 
-While the restreaming process is lightweight, **your bandwidth requirements will increase with each destination you add.**
+While the restreaming process is lightweight, **your bandwidth requirements will increase with each destination you add.** 📈
 Ensure you have sufficient bandwidth to support the number of destinations you intend to stream to ⤴️
 
 Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any other platform that supports `bash`, `ffmpeg` and `yq` 👍️
