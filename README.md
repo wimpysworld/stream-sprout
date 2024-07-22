@@ -3,7 +3,7 @@
 
 # Stream Sprout
 
-**Restream a video source to multiple destinations such as Twitch, YouTube, and Owncast.**
+**Restream a video source to multiple destinations such as Twitch, YouTube, Owncast and Peertube**
 
 **Made with 💝 for <img src=".github/tux.png" align="top" width="24" alt="Tux (Linux)"/> & <img src=".github/apple.png" align="top" width="24" alt="Apple (macOS)"/>**
 </div>
@@ -17,10 +17,11 @@
 
 # Introduction
 
-Stream Sprout 🌱 is a simple, self-contained, and easy-to-use solution for streaming to multiple destinations such as Twitch, YouTube, and [Owncast](https://owncast.online/) 📡
-It uses [FFmpeg](https://ffmpeg.org/) to receive the video stream from OBS Studio (or anything that can publish a RTMP stream) and then restream it to multiple destinations; providing similar functionality as services like Restream.io and Livepush.io but without the need to pay 💸 for a third-party service or run something like nginx with the [RTMP module](https://github.com/arut/nginx-rtmp-module).
+Stream Sprout 🌱 is a simple, self-contained, and easy-to-use solution for streaming to multiple destinations such as Twitch, YouTube, [Owncast](https://owncast.online/) and [Peertube](https://joinpeertube.org/) 📡
 
-Stream Sprout is designed to be run on the same machine as your [OBS Studio](https://obsproject.com/) instance (but can be run remotely), is configured with a simple YAML file and can be executed by regular users without the need for root privileges.
+It uses [FFmpeg](https://ffmpeg.org/) to receive the video stream from OBS Studio (or anything that can publish a RTMP stream) and then restreams it to multiple destinations; providing similar functionality as services like Restream.io and Livepush.io but without the need to pay 💸 for a third-party service or run something like nginx with the [RTMP module](https://github.com/arut/nginx-rtmp-module).
+
+Stream Sprout is configured with a simple YAML file and designed to be run on the same computer as your [OBS Studio](https://obsproject.com/) instance (it can be run remotely too) and does not require root privileges.
 
 There is no transcoding or processing of the video stream 🎞️
 The stream is received and then restreamed to the destinations you configure without modification.
@@ -33,19 +34,22 @@ Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any ot
 
 ## Get Started
 
-- [Install](#installation) Stream Sprout
-- [Configure](#configuration) Stream Sprout
-- [Configure](#configure-obs-studio) OBS Studio
-- Start `stream-sprout`
-- Click the *Start Streaming* button in OBS Studio
+- [Install](#installation) Stream Sprout 🧑‍💻
+- [Configure](#configuration) Stream Sprout 🧑‍💻
+- [Configure](#configure-obs-studio) OBS Studio 🎛️
+- Start `stream-sprout` ⌨️
+- Click the *Start Streaming* button in OBS Studio 🖱️
+- Do you your thing 🎥
+- Click the *Stop Streaming* button in OBS Studio 🖱️
+- <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop `stream-sprout` ⌨️
 
 ## Installation
 
 ### Debian
 
-`yq` is available in bullseye-backports, bookworm, trixie and newer.
+Stream Sprout depends on `yq` and that is available in bullseye-backports, bookworm, trixie and newer.
 
-- Download the Stream Sprout .deb package from the [releases page]()
+- Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
 - Install it with `apt-get install ./stream-sprout_0.1.0-1_all.deb`.
 
 ### macOS
@@ -67,15 +71,16 @@ cd stream-sprout
 
 [![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/wimpysworld/stream-sprout/badge)](https://flakehub.com/flake/wimpysworld/stream-sprout)
 
-Stable releases of Stream Sprout are published to FlakeHub for Nix users. See the flake on FlakeHub for more details:
+Stable releases of Stream Sprout are published to FlakeHub for Nix users ❄️
+See the flake on FlakeHub for more details:
 
 - <https://flakehub.com/flake/wimpysworld/stream-sprout>
 
 ### Ubuntu 24.04 and newer
 
-`yq` is available in Ubuntu 24.04 and newer.
+Stream Sprout depends on `yq` and that has been available in Ubuntu since 23.10.
 
-- Download the Stream Sprout .deb package from the [releases page]()
+- Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
 - Install it with `apt-get install ./stream-sprout_0.1.0-1_all.deb`.
 
 For Ubuntu versions earlier than 24.04 you can [install Stream Sprout from source](#from-source).
@@ -91,7 +96,8 @@ cd stream-sprout
 
 ## Configure Stream Sprout
 
-Copy the [example Stream Sprout configuration](https://github.com/wimpysworld/stream-sprout/blob/main/stream-sprout.yaml.example) and edit it to suit your needs.
+Copy the [example Stream Sprout configuration](https://github.com/wimpysworld/stream-sprout/blob/main/stream-sprout.yaml.example) and edit it to suit your needs 📝
+
 Stream Sprout will look for a configuration file in the following locations, in this order:
 - Current working directory `./stream-sprout.yaml`
 - XDG configuration directory `$XDG_CONFIG_HOME/stream-sprout.yaml` (*Linux*) or `~/.config/stream-sprout.yaml` (*macOS*)
@@ -99,18 +105,29 @@ Stream Sprout will look for a configuration file in the following locations, in 
 
 ### Server
 
-The `server:` section is used to configure the RTMP server that Stream Sprout will listen on.
-`url:` is the URL that Stream Sprout will listen on; it must be an RTMP URL.
-If you remotely host Stream Sprout, you should set `key:` to a secure value to prevent unauthorised access.
+The `server:` section is used to configure the RTMP server that Stream Sprout creates; it must be an RTMP URL.
+The default port for RTMP is `1935`, but you can use any port you like.
+If you remotely host Stream Sprout, you should use an IP address in the `url:` that accessible by your computer that runs OBS Studio and also set `key:` to a secure value to prevent unauthorized access.
+Running `uuidgen` will generate a suitable value.
+
+If `archive_stream:` is `true` Stream Sprout will archive the stream to disk in the directory specified by `archive_path:`.
+If `archive_path:` is not accessible, Stream Sprout will fallback to using the current working directory.
+
+Here's an example configuration for the Stream Sprout `server:` section.
 
 ```yaml
-If `archive_stream:` is `true` Stream Sprout will archive the stream to disk in the directory specified by `archive_path:`.
+server:
+  url: "rtmp://127.0.0.1:1935"
+  key: "<insert your own key here>"
+  archive_stream: false
+  archive_path: "${HOME}/Streams"
+```
 
 ### Services
 
 `services:` are arbitrarily named.
-Just create an entry for each RTMP destination you want to stream to.
-The example configuration includes example entries for Trovo, Twitch, and YouTube.
+**Just create an entry for each RTMP destination you want to stream to.**
+The example configuration includes entries for Trovo, Twitch, and YouTube but any RTMP destination can be added.
 
 ```yaml
 services:
@@ -118,18 +135,6 @@ services:
     enabled: true
     rtmp_server: "rtmp://rtmp.example.com/live/"
     key: "my_super_secret_stream_key"
-```
-
-### Trovo
-
-Here's an example configuration for Trovo.
-
-```yaml
-services:
-  trovo:
-    enabled: false
-    rtmp_server: "rtmp://livepush.trovo.live/live/"
-    key: "<your_stream_key>"
 ```
 
 ### Twitch
@@ -146,17 +151,17 @@ services:
 
 #### Ingest servers
 
-The example configuration uses the primary Twitch ingest server, which is `rtmp://live.twitch.tv/app/`.
-If you want to optimise your stream quality, you can use a server closer to your location.
-A short list of recommended servers based on your location is available from [Recommended Ingest Endpoints For You](https://help.twitch.tv/s/twitch-ingest-recommendation).
+The example configuration uses the primary Twitch ingest endpoint, which is `rtmp://live.twitch.tv/app/`.
+If you want to optimize your stream latency, you can use a Twitch ingest endpoint closer to your location.
+A short list of recommended endpoints, based on your whereabouts, is available from [Recommended Ingest Endpoints For You](https://help.twitch.tv/s/twitch-ingest-recommendation).
 
-You can find a complete list of Twitch ingest servers from <https://twitchstatus.com/>.
+You can find a complete list of Twitch ingest endpoints from <https://twitchstatus.com/>.
 
 #### Testing
 
 If you want to test streaming to Twitch without going live, you can use the `?bandwidthtest=true` query parameter.
 
-Add `?bandwidthtest=true` to the end of your Twitch stream key, this will enable bandwidth testing, which you can monitor at <https://inspector.twitch.tv/>, and the stream will not go live on your channel.
+Add `?bandwidthtest=true` to the end of your Twitch stream key, this will enable bandwidth testing, which you can monitor using <https://inspector.twitch.tv/>, and the stream will not go live on your channel.
 
 ### YouTube
 
@@ -184,6 +189,7 @@ services:
 ## Limitations
 
 - Stream Sprout does not support secure RTMP (RTMPS) at this time.
+  - *At least I don't think it does, but I haven't fully tested it.*
 - Each destination you add will increase your bandwidth requirements.
 
 ## References
