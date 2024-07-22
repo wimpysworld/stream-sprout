@@ -7,7 +7,7 @@ mkShell {
   packages = with pkgs; ([
     ffmpeg-headless
     procps
-    yq-go
+    yq
   ]);
 
   shellHook = ''
