@@ -3,7 +3,7 @@
 
 # Stream Sprout
 
-**Restream OBS Studio to multiple destinations with ease**
+**Restream a video source to multiple destinations such as Twitch, YouTube, and Owncast.**
 
 **Made with 💝 for <img src=".github/tux.png" align="top" width="24" alt="Tux (Linux)"/> & <img src=".github/apple.png" align="top" width="24" alt="Apple (macOS)"/>**
 </div>
@@ -29,17 +29,33 @@ Stream Sprout uses FFmpeg to re-stream a video source to multiple destinations s
 
 ## Installation
 
-### Debian / Ubuntu
+### Debian
 
-- tbc
+`yq` is available in bullseye-backports, bookworm, trixie and newer.
+
+- Download the Stream Sprout .deb package from the [releases page]()
+- Install it with `apt-get install ./stream-sprout_0.1.0-1_all.deb`.
 
 ### NixOS
 
-- tbc
+[![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/wimpysworld/stream-sprout/badge)](https://flakehub.com/flake/wimpysworld/stream-sprout)
+
+Stable releases of Stream Sprout are published to FlakeHub for Nix users. See the flake on FlakeHub for more details:
+
+- <https://flakehub.com/flake/wimpysworld/stream-sprout>
+
+## Ubuntu 24.04 and newer
+
+`yq` is available in Ubuntu 24.04 and newer.
+
+- Download the Stream Sprout .deb package from the [releases page]()
+- Install it with `apt-get install ./stream-sprout_0.1.0-1_all.deb`.
+
+For Ubuntu versions earlier than 24.04 you can [install Stream Sprout from source](#from-source).
 
 ### From source
 
-You need to have [FFmpeg](https://ffmpeg.org/) and [yq](https://github.com/mikefarah/yq) installed on your system.
+You need to have [FFmpeg](https://ffmpeg.org/) and [yq](https://github.com/kislyuk/yq) installed on your system.
 
 ```bash
 git clone https://github.com/wimpysworld/stream-sprout.git
