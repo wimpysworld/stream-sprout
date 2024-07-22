@@ -17,7 +17,19 @@
 
 # Introduction
 
-Stream Sprout uses FFmpeg to re-stream a video source to multiple destinations such as Twitch, YouTube, and Owncast.
+Stream Sprout 🌱 is a simple, self-contained, and easy-to-use solution for streaming to multiple destinations such as Twitch, YouTube, and [Owncast](https://owncast.online/) 📡
+It uses [FFmpeg](https://ffmpeg.org/) to receive the video stream from OBS Studio (or anything that can publish a RTMP stream) and then restream it to multiple destinations; providing similar functionality as services like Restream.io and Livepush.io but without the need to pay 💸 for a third-party service or run something like nginx with the [RTMP module](https://github.com/arut/nginx-rtmp-module).
+
+Stream Sprout is designed to be run on the same machine as your [OBS Studio](https://obsproject.com/) instance (but can be run remotely), is configured with a simple YAML file and can be executed by regular users without the need for root privileges.
+
+There is no transcoding or processing of the video stream 🎞️
+The stream is received and then restreamed to the destinations you configure without modification.
+Optionally you can also archive the stream to disk 💾
+
+While the restreaming process is lightweight, **your bandwidth requirements will increase with each destination you add.**
+Ensure you have sufficient bandwidth to support the number of destinations you intend to stream to ⤴️
+
+Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any other platform that supports `bash`, `ffmpeg` and `yq` 👍️
 
 ## Get Started
 
@@ -36,7 +48,22 @@ Stream Sprout uses FFmpeg to re-stream a video source to multiple destinations s
 - Download the Stream Sprout .deb package from the [releases page]()
 - Install it with `apt-get install ./stream-sprout_0.1.0-1_all.deb`.
 
-### NixOS
+### macOS
+
+Install the Stream Sprout requirements using `brew`:
+
+```shell
+brew install bash ffmpeg procps yq
+```
+
+Now clone the project:
+
+```shell
+git clone https://github.com/wimpysworld/stream-sprout.git
+cd stream-sprout
+```
+
+### Nix & NixOS
 
 [![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/wimpysworld/stream-sprout/badge)](https://flakehub.com/flake/wimpysworld/stream-sprout)
 
@@ -44,7 +71,7 @@ Stable releases of Stream Sprout are published to FlakeHub for Nix users. See th
 
 - <https://flakehub.com/flake/wimpysworld/stream-sprout>
 
-## Ubuntu 24.04 and newer
+### Ubuntu 24.04 and newer
 
 `yq` is available in Ubuntu 24.04 and newer.
 
@@ -64,9 +91,22 @@ cd stream-sprout
 
 ## Configure Stream Sprout
 
-Copy the [example Stream Sprout configuration](https://github.com/wimpysworld/stream-sprout/blob/main/stream-sprout.yaml.example) file and edit it to suit your needs.
+Copy the [example Stream Sprout configuration](https://github.com/wimpysworld/stream-sprout/blob/main/stream-sprout.yaml.example) and edit it to suit your needs.
+Stream Sprout will look for a configuration file in the following locations, in this order:
+- Current working directory `./stream-sprout.yaml`
+- XDG configuration directory `$XDG_CONFIG_HOME/stream-sprout.yaml` (*Linux*) or `~/.config/stream-sprout.yaml` (*macOS*)
+- `/etc/stream-sprout.yaml`
 
-`services:` are arbitrarily named. Just create an entry for each RTMP destination you want to stream to.
+### Server
+
+The `server:` section is used to configure the RTMP server that Stream Sprout will listen on.
+If `archive_stream:` is `true` Stream Sprout will archive the stream to disk in the directory specified by `archive_path:`.
+
+### Services
+
+`services:` are arbitrarily named.
+Just create an entry for each RTMP destination you want to stream to.
+The example configuration includes example entries for Trovo, Twitch, and YouTube.
 
 ```yaml
 services:
@@ -78,7 +118,7 @@ services:
 
 ### Trovo
 
-Here's are example configurations for Trovo.
+Here's an example configuration for Trovo.
 
 ```yaml
 services:
@@ -90,7 +130,7 @@ services:
 
 ### Twitch
 
-Here's are example configurations for Twitch.
+Here's an example configuration for Twitch.
 
 ```yaml
 services:
@@ -102,7 +142,9 @@ services:
 
 #### Ingest servers
 
-The example configuration uses the primary Twitch ingest server, which is `rtmp://live.twitch.tv/app/`. If you want to optimise your stream quality, you can use a server closer to your location. A short list of recommended servers based on your location is available from [Recommended Ingest Endpoints For You](https://help.twitch.tv/s/twitch-ingest-recommendation).
+The example configuration uses the primary Twitch ingest server, which is `rtmp://live.twitch.tv/app/`.
+If you want to optimise your stream quality, you can use a server closer to your location.
+A short list of recommended servers based on your location is available from [Recommended Ingest Endpoints For You](https://help.twitch.tv/s/twitch-ingest-recommendation).
 
 You can find a complete list of Twitch ingest servers from <https://twitchstatus.com/>.
 
@@ -114,7 +156,7 @@ Add `?bandwidthtest=true` to the end of your Twitch stream key, this will enable
 
 ### YouTube
 
-Here's are example configurations for YouTube.
+Here's an example configuration for YouTube.
 
 ```yaml
 services:
@@ -130,7 +172,12 @@ services:
 - Go to `Settings` > `Stream`
 - Select `Custom` from the `Service` dropdown
 - Copy the server `url:` from your Stream Sprout configuration to the `Server` field:
-  - `rtmp://127.0.0.1:1935`
+  - `rtmp://127.0.0.1:1935` (*default*)
+
+## Limitations
+
+- Stream Sprout does not support secure RTMP (RTMPS) at this time.
+- Each destination you add will increase your bandwidth requirements.
 
 ## References
 
