@@ -120,11 +120,18 @@ trap ctrl_c INT
 while true; do
     echo "Stream Sprout v${VERSION} using ${STREAM_SPROUT_CONFIG}"
     SERVER_URL=$(yq e ".server.url" "${STREAM_SPROUT_CONFIG}")
+    SERVER_KEY=$(yq e ".server.key" "${STREAM_SPROUT_CONFIG}")
     if [[ ! "${SERVER_URL}" =~ ^rtmp://.* ]]; then
         echo " - Invalid URL:  ${SERVER_URL} is not a valid RTMP URL."
         exit 1
     fi
-    echo " - Server:  ${SERVER_URL}"
+    echo -n " - Server:  ${SERVER_URL}"
+    if [ "${SERVER_KEY}" != "null" ]; then
+        SERVER_URL+="/${SERVER_KEY}"
+        echo " (key required)"
+    else
+        echo ""
+    fi
     STREAM_TEE=""
     get_stream_tee
     ffmpeg \
