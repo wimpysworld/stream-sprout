@@ -19,7 +19,7 @@ Depends:
  yq,
  ${misc:Depends},
  ${shlibs:Depends},
-Description: Restream to multiple destinations with ease.
+Description: Restream a video source to multiple destinations such as Twitch, YouTube, and Owncast.
  Stream Sprout uses FFmpeg to re-stream a video source to multiple destinations
  such as Twitch, YouTube, and Owncast.
  .
