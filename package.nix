@@ -3,14 +3,18 @@
 , makeWrapper
 , stdenv
 , ffmpeg-headless
+, gawk
+, gnugrep
+, gnused
 , procps
-, yq
 }:
 let
   runtimePaths = [
     ffmpeg-headless
+    gawk
+    gnugrep
+    gnused
     procps
-    yq
   ];
   versionMatches =
     builtins.match ''
