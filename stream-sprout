@@ -5,7 +5,7 @@
 stty -echoctl
 
 readonly STREAM_SPROUT_YAML="stream-sprout.yaml"
-readonly VERSION="0.1.4"
+readonly VERSION="0.1.5"
 
 function cleanup() {
     echo -e " \e[31m\U26D4\e[0m Control-C"
