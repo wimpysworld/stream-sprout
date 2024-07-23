@@ -2,6 +2,7 @@
 , installShellFiles
 , makeWrapper
 , stdenv
+, coreutils-full
 , ffmpeg-headless
 , gawk
 , gnugrep
@@ -10,11 +11,11 @@
 }:
 let
   runtimePaths = [
+    coreutils-full
     ffmpeg-headless
     gawk
     gnugrep
     gnused
-    procps
   ];
   versionMatches =
     builtins.match ''
