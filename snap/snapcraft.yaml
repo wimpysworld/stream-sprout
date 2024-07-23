@@ -1,0 +1,49 @@
+name: stream-sprout
+base: core24
+version: git
+summary: Restream video to multiple destinations
+description: |
+  Restream a video source to multiple destinations such as Twitch, YouTube,
+  and Owncast
+
+grade: stable
+confinement: strict
+
+platforms:
+  amd64:
+    build-on: [ amd64 ]
+    build-for: [ amd64 ]
+  arm64:
+    build-on: [ arm64 ]
+    build-for:  [arm64 ]
+  armhf:
+    build-on: [ armhf ]
+    build-for: [ armhf ]
+
+parts:
+  stream-sprout:
+    after: [ deps ]
+    plugin: dump
+    source: .
+    prime:
+      - stream-sprout
+      - stream-sprout.yaml.example
+      - LICENSE
+      - SECURITY.md
+
+  deps:
+    plugin: nil
+    stage-packages:
+      - ffmpeg
+      - sed
+      - awk
+      - grep
+
+apps:
+  stream-sprout:
+    command: stream-sprout
+    plugs:
+      - home
+      - removable-media
+      - network-bind
+      - network
