@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2154
 
+# Disable echo of control characters like ^C
+stty -echoctl
+
 readonly STREAM_SPROUT_YAML="stream-sprout.yaml"
 readonly VERSION="0.1.4"
 
