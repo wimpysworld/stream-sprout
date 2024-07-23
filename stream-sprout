@@ -141,6 +141,7 @@ while true; do
     fi
     STREAM_TEE=""
     get_stream_tee
+    FFMPEG_LOG=$(mktemp /tmp/ffmpeg.XXXXXX.log)
     ffmpeg \
         -hide_banner \
         -flags +global_header \
@@ -149,8 +150,44 @@ while true; do
         -flvflags no_duration_filesize \
         -c:v copy -c:a copy -map 0 \
         -movflags +faststart \
-        -f tee -use_fifo 1 "${STREAM_TEE}" 2>/dev/null
-    echo " - Server:  Stopping..."
+        -f tee -use_fifo 1 "${STREAM_TEE}" >"${FFMPEG_LOG}" 2>&1 &
+
+    # Capture the PID of the ffmpeg process
+    FFMPEG_PID=$!
+
+    echo -e " \U2B07  FFmpeg process (${FFMPEG_PID}) logging to ${FFMPEG_LOG}"
+
+    COUNTER=0
+    # 0 for standing-by
+    # 1 for streaming
+    STREAMING_STATUS=0
+
+    # Monitor the FFmpeg process
+    while sleep 1; do
+        STAMP="[$(date +%H:%M:%S)]"
+        if ! ps -p "${FFMPEG_PID}" > /dev/null; then
+            echo -e " \e[31m\U23F9\e[0m  FFmpeg process (${FFMPEG_PID}) has ended"
+            break
+        else
+            if grep "Input #0, flv, from 'rtmp://" "${FFMPEG_LOG}" > /dev/null; then
+                NEW_STATUS=1
+            else
+                NEW_STATUS=0
+            fi
+
+            # Check if status changed or if it's time to log the status again
+            if [[ ${NEW_STATUS} -ne ${STREAMING_STATUS} ]] || (( COUNTER % 30 == 0 )); then
+                if [[ ${NEW_STATUS} -eq 1 ]]; then
+                    echo -e " \e[32m\U25B6\e[0m  FFmpeg process (${FFMPEG_PID}) is streaming   ${STAMP}"
+                else
+                    echo -e " \e[33m\U23F8\e[0m  FFmpeg process (${FFMPEG_PID}) is standing-by ${STAMP}"
+                fi
+                 # Update the current status
+                STREAMING_STATUS=${NEW_STATUS}
+            fi
+            ((COUNTER++))
+        fi
+    done
     rename_archive
     echo
 done
