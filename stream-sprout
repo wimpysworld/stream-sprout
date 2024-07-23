@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 readonly STREAM_SPROUT_YAML="stream-sprout.yaml"
-readonly VERSION="0.1.1"
+readonly VERSION="0.1.2"
 
 function ctrl_c() {
     echo " - Trapped: CTRL-C"
