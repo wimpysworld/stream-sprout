@@ -12,7 +12,7 @@ function ctrl_c() {
 
 function get_archive_path() {
     local ARCHIVE_PATH=""
-    ARCHIVE_PATH=$(yq e ".server.archive_path" "${STREAM_SPROUT_CONFIG}")
+    ARCHIVE_PATH=$(yq -r ".server.archive_path" "${STREAM_SPROUT_CONFIG}")
     # Expand any environment variables in the path
     ARCHIVE_PATH=$(eval echo "${ARCHIVE_PATH}")
     if [ -z "${ARCHIVE_PATH}" ]; then
@@ -39,7 +39,7 @@ function add_archive() {
     ARCHIVE_TEMP="stream-temp-$(date +%s%N).mkv"
 
     # Check if recording is enabled in the YAML configuration
-    ARCHIVE_ENABLED=$(yq e ".server.archive_stream" "${STREAM_SPROUT_CONFIG}")
+    ARCHIVE_ENABLED=$(yq -r ".server.archive_stream" "${STREAM_SPROUT_CONFIG}")
     if [[ "${ARCHIVE_ENABLED,,}" == "true" || "${ARCHIVE_ENABLED}" == "1" ]]; then
         echo " - Archive: ${ARCHIVE_PATH}/${ARCHIVE_TEMP}"
         if [ -n "${STREAM_TEE}" ]; then
@@ -66,20 +66,20 @@ function get_stream_tee() {
     local URI=""
 
     # Extract services from the YAML
-    SERVICES=$(yq e '.services | keys | .[]' "${STREAM_SPROUT_CONFIG}")
+    SERVICES=$(yq -r '.services | keys | .[]' "${STREAM_SPROUT_CONFIG}")
 
     # Iterate over each service
     for SERVICE in ${SERVICES}; do
         # Check if the service is enabled in the YAML configuration
-        SERVICE_ENABLED=$(yq e ".services.${SERVICE}.enabled" "${STREAM_SPROUT_CONFIG}")
+        SERVICE_ENABLED=$(yq -r ".services.${SERVICE}.enabled" "${STREAM_SPROUT_CONFIG}")
         if [[ "${SERVICE_ENABLED,,}" == "true" || "${SERVICE_ENABLED}" == "1" ]]; then
             echo " - Service: ${SERVICE}"
-            URI=$(yq e ".services.${SERVICE}.rtmp_server" "${STREAM_SPROUT_CONFIG}")
+            URI=$(yq -r ".services.${SERVICE}.rtmp_server" "${STREAM_SPROUT_CONFIG}")
             if [[ ! "${URI}" =~ ^rtmp://.* ]]; then
                 echo " - Invalid URL:  ${SERVICE} is not a valid RTMP URL."
                 return
             fi
-            URI+=$(yq e ".services.${SERVICE}.key" "${STREAM_SPROUT_CONFIG}")
+            URI+=$(yq -r ".services.${SERVICE}.key" "${STREAM_SPROUT_CONFIG}")
             add_service "${URI}"
         fi
     done
@@ -109,7 +109,7 @@ else
 fi
 
 # Check if the file is valid YAML
-if ! yq eval '.' "${STREAM_SPROUT_CONFIG}" &>/dev/null; then
+if ! yq '.' "${STREAM_SPROUT_CONFIG}" &>/dev/null; then
     echo "ERROR: ${STREAM_SPROUT_CONFIG} is not valid YAML."
     exit 1
 fi
@@ -119,8 +119,8 @@ trap ctrl_c INT
 
 while true; do
     echo "Stream Sprout v${VERSION} using ${STREAM_SPROUT_CONFIG}"
-    SERVER_URL=$(yq e ".server.url" "${STREAM_SPROUT_CONFIG}")
-    SERVER_KEY=$(yq e ".server.key" "${STREAM_SPROUT_CONFIG}")
+    SERVER_URL=$(yq -r ".server.url" "${STREAM_SPROUT_CONFIG}")
+    SERVER_KEY=$(yq -r ".server.key" "${STREAM_SPROUT_CONFIG}")
     if [[ ! "${SERVER_URL}" =~ ^rtmp://.* ]]; then
         echo " - Invalid URL:  ${SERVER_URL} is not a valid RTMP URL."
         exit 1
