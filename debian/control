@@ -17,7 +17,6 @@ Depends:
  ffmpeg,
  grep,
  mawk,
- procps,
  sed,
  ${misc:Depends},
  ${shlibs:Depends},

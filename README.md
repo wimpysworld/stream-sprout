@@ -55,7 +55,7 @@ Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any ot
 Install the Stream Sprout requirements using `brew`:
 
 ```shell
-brew install bash ffmpeg procps
+brew install bash ffmpeg
 ```
 
 Now clone the project:
