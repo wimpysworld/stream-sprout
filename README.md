@@ -83,6 +83,52 @@ See the flake on FlakeHub for more details:
 - Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
 - Install it with `apt-get install ./stream-sprout_0.1.4-1_all.deb`.
 
+### Docker & Podman
+
+#### Pull the container
+
+The Stream Sprout container image is available from the GitHub Container Registry.
+To pull the latest container image:
+
+```shell
+docker pull ghcr.io/wimpysworld/stream-sprout:latest
+```
+
+Or if you want a specific version:
+
+```shell
+docker pull ghcr.io/wimpysworld/stream-sprout:0.1.4
+```
+
+#### Run the container
+
+The `stream-sprout.yaml` configuration file will be on the host computer so you need mount a volume to access it from the container.
+
+If you have already pulled the container image, you can run Stream Sprout with:
+
+```shell
+docker run -p 1935:1935 -it -v $PWD:/data stream-sprout --config /data/stream-sprout.yaml
+```
+
+If you have not pulled or built the container image, you can run Stream Sprout with:
+
+```shell
+docker run -p 1935:1935 -it -v $PWD:/data ghcr.io/wimpysworld/stream-sprout:latest --config /data/stream-sprout.yaml
+```
+
+- The `-p 1935:1935` part will expose the RTMP server port `1935` on the host computer.
+  - If you have configured Stream Sprout to use a different port, you should change the port number here too.
+- The `-it` options will run the container in interactive mode.
+- The `-v $PWD:/data` part will mount your current directory `$PWD` as `/data` within the container, allowing you to access your files using the `/data` path.
+
+#### Build the container
+
+Build the Stream Sprout container image:
+
+```shell
+docker build -t stream-sprout .
+```
+
 ### From source
 
 You need to have [FFmpeg](https://ffmpeg.org/) on your system.
@@ -196,9 +242,11 @@ services:
 
 These are some of the references used to create this project:
 
- - https://trac.ffmpeg.org/wiki/EncodingForStreamingSites
- - https://ffmpeg.org/ffmpeg-protocols.html#rtmp
- - https://ffmpeg.org/ffmpeg-formats.html#flv
- - https://ffmpeg.org/ffmpeg-formats.html#tee-1
- - https://obsproject.com/forum/resources/obs-studio-stream-to-multiple-platforms-or-channels-at-once.932/
- - https://stackoverflow.com/questions/16658873/how-to-minimize-the-delay-in-a-live-streaming-with-ffmpeg
+- https://trac.ffmpeg.org/wiki/EncodingForStreamingSites
+- https://ffmpeg.org/ffmpeg-protocols.html#rtmp
+- https://ffmpeg.org/ffmpeg-formats.html#flv
+- https://ffmpeg.org/ffmpeg-formats.html#tee-1
+- https://obsproject.com/forum/resources/obs-studio-stream-to-multiple-platforms-or-channels-at-once.932/
+- https://stackoverflow.com/questions/16658873/how-to-minimize-the-delay-in-a-live-streaming-with-ffmpeg
+- https://dev.to/ajeetraina/run-ffmpeg-within-a-docker-container-a-step-by-step-guide-c0l
+- https://github.com/jrottenberg/ffmpeg
