@@ -30,6 +30,8 @@ jobs:
       uses: actions/checkout@v4
     - name: "Build & Test .deb 🍥"
       env:
+        DEBFULLNAME: "Martin Wimpress"
+        DEBEMAIL: "code@wimpress.io"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         sudo apt-get -y update
