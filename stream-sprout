@@ -20,6 +20,22 @@ function cleanup() {
     exit
 }
 
+# Function to display help
+function show_help() {
+    echo "Restream a video source to multiple destinations such as Twitch, YouTube, Owncast and Peertube."
+    echo ""
+    echo "Usage: $(basename "${0}") [options]"
+    echo ""
+    echo "Options:"
+    echo "  --config <path>    Specify a custom config file path."
+    echo "  --version          Show version information."
+    echo "  --help             Display this help message."
+}
+
+function show_version() {
+    echo -e "\e[92mStream Sprout\e[0m ${VERSION} using FFmpeg ${FFMPEG_VER}"
+}
+
 # https://stackoverflow.com/questions/5014632/how-can-i-parse-a-yaml-file-from-a-linux-shell-script
 function parse_yaml() {
    local prefix="${2}"
@@ -153,28 +169,58 @@ if ! command -v ffmpeg &> /dev/null; then
     exit 1
 fi
 
-# Check in the current working directory
-if [ -f "./${STREAM_SPROUT_YAML}" ]; then
-    STREAM_SPROUT_CONFIG="./${STREAM_SPROUT_YAML}"
-# Check in the user's home directory, considering XDG on Linux and compatibility with macOS
-elif [ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/${STREAM_SPROUT_YAML}" ]; then
-    STREAM_SPROUT_CONFIG="${XDG_CONFIG_HOME:-${HOME}/.config}/${STREAM_SPROUT_YAML}"
-# Check in /etc
-elif [ -f "/etc/${STREAM_SPROUT_YAML}" ]; then
-    STREAM_SPROUT_CONFIG="/etc/${STREAM_SPROUT_YAML}"
-else
-    echo -e " \e[31m\U1F6AB\e[0m ${STREAM_SPROUT_YAML} was not found. Exiting."
-    exit 1
+FFMPEG_VER="$(ffmpeg -version | head -n 1 | cut -d' ' -f3)"
+
+# Parse command line arguments
+while [[ "$#" -gt 0 ]]; do
+    case "${1}" in
+        --config)
+            STREAM_SPROUT_CONFIG="${2}"
+            shift
+            if [ ! -f "${STREAM_SPROUT_CONFIG}" ]; then
+                echo -e " \e[31m\U1F6AB\e[0m ${STREAM_SPROUT_CONFIG} was not found. Exiting."
+                exit 1
+            fi;;
+        --version)
+            show_version
+            exit 0;;
+        --help)
+            show_help
+            exit 0;;
+        *)
+            echo "Unknown option: ${1}"
+            show_help
+            exit 1;;
+    esac
+    shift
+done
+
+# Check if a custom config path was not provided
+if [ -z "${STREAM_SPROUT_CONFIG}" ]; then
+    # Check in the current working directory
+    if [ -f "./${STREAM_SPROUT_YAML}" ]; then
+        STREAM_SPROUT_CONFIG="./${STREAM_SPROUT_YAML}"
+    # Check in the user's home directory, considering XDG on Linux and compatibility with macOS
+    elif [ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/${STREAM_SPROUT_YAML}" ]; then
+        STREAM_SPROUT_CONFIG="${XDG_CONFIG_HOME:-${HOME}/.config}/${STREAM_SPROUT_YAML}"
+    # Check in /etc
+    elif [ -f "/etc/${STREAM_SPROUT_YAML}" ]; then
+        STREAM_SPROUT_CONFIG="/etc/${STREAM_SPROUT_YAML}"
+    else
+        echo -e " \e[31m\U1F6AB\e[0m ${STREAM_SPROUT_YAML} was not found. Exiting."
+        exit 1
+    fi
 fi
+
+banner
 
 # trap relevant signals and call cleanup()
 trap cleanup INT QUIT TERM
 
-banner
-
 while true; do
     eval "$(parse_yaml "${STREAM_SPROUT_CONFIG}" sprout_)"
-    echo "Stream Sprout v${VERSION} using ${STREAM_SPROUT_CONFIG}"
+    show_version
+    echo -e " \U2699  ${STREAM_SPROUT_CONFIG}"
     if [[ ! "${sprout_server_url}" =~ ^rtmp://.* ]]; then
         echo -e " \e[31m\U1F6AB\e[0m ${sprout_server_url} is not a valid RTMP server URL."
         exit 1
