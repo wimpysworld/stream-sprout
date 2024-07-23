@@ -112,7 +112,7 @@ Here's an example configuration for the Stream Sprout `server:` section.
 ```yaml
 server:
   url: "rtmp://127.0.0.1:1935"
-  key: "<insert your own key here>"
+  key: "create your key with uuidgen here"
   archive_stream: false
   archive_path: "${HOME}/Streams"
 ```
@@ -140,7 +140,7 @@ services:
   twitch:
     enabled: true
     rtmp_server: "rtmp://live.twitch.tv/app/"
-    key: "<your_stream_key>"
+    key: "your_twitch_stream_key"
 ```
 
 #### Ingest servers
@@ -166,7 +166,7 @@ services:
   youtube:
     enabled: true
     rtmp_server: "rtmp://a.rtmp.youtube.com/live2/"
-    key: "<your_stream_key>"
+    key: "your_youtube_stream_key"
 ```
 
 ## Configure OBS Studio
