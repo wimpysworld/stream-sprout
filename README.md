@@ -52,7 +52,7 @@ Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any ot
 ### Debian
 
 - Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
-- Install it with `apt-get install ./stream-sprout_0.1.3-1_all.deb`.
+- Install it with `apt-get install ./stream-sprout_0.1.4-1_all.deb`.
 
 ### macOS
 
@@ -81,7 +81,7 @@ See the flake on FlakeHub for more details:
 ### Ubuntu
 
 - Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
-- Install it with `apt-get install ./stream-sprout_0.1.3-1_all.deb`.
+- Install it with `apt-get install ./stream-sprout_0.1.4-1_all.deb`.
 
 ### From source
 
@@ -96,12 +96,22 @@ cd stream-sprout
 
 Copy the [example Stream Sprout configuration](https://github.com/wimpysworld/stream-sprout/blob/main/stream-sprout.yaml.example) and edit it to suit your needs 📝
 
-Stream Sprout will look for a configuration file in the following locations, in this order:
+You can specify the configuration file to use with the `--config <path>` option.
+If you don't specify a configuration file, Stream Sprout will look for a configuration file in the following locations, in this order:
+
 - Current working directory `./stream-sprout.yaml`
 - XDG configuration directory `$XDG_CONFIG_HOME/stream-sprout.yaml` (*Linux*) or `~/.config/stream-sprout.yaml` (*macOS*)
 - `/etc/stream-sprout.yaml`
 
 ### Server
+
+```yaml
+server:
+  url: "rtmp://127.0.0.1:1935"
+  key: "create your key with uuidgen here"
+  archive_stream: false
+  archive_path: "${HOME}/Streams"
+```
 
 The `server:` section is used to configure the RTMP server that Stream Sprout creates; it must be an RTMP URL.
 The default port for RTMP is `1935`, but you can use any port you like.
@@ -112,14 +122,6 @@ If `archive_stream:` is `true` Stream Sprout will archive the stream to disk in 
 If `archive_path:` is not accessible, Stream Sprout will fallback to using the current working directory.
 
 Here's an example configuration for the Stream Sprout `server:` section.
-
-```yaml
-server:
-  url: "rtmp://127.0.0.1:1935"
-  key: "create your key with uuidgen here"
-  archive_stream: false
-  archive_path: "${HOME}/Streams"
-```
 
 ### Services
 
