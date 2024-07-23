@@ -173,7 +173,7 @@ trap cleanup INT QUIT TERM
 banner
 
 while true; do
-    eval "$(parse_yaml "${STREAM_SPROUT_YAML}" sprout_)"
+    eval "$(parse_yaml "${STREAM_SPROUT_CONFIG}" sprout_)"
     echo "Stream Sprout v${VERSION} using ${STREAM_SPROUT_CONFIG}"
     if [[ ! "${sprout_server_url}" =~ ^rtmp://.* ]]; then
         echo -e " \e[31m\U1F6AB\e[0m ${sprout_server_url} is not a valid RTMP server URL."
