@@ -1,12 +1,11 @@
 name: 🧪 Test snap builds on x86_64
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
-on: workflow_dispatch
 
 jobs:
   build:
@@ -18,22 +17,22 @@ jobs:
 
       - name: Build snap
         uses: snapcore/action-build@v1
-        id: build
+        id: snapcraft
 
       - name: Show log on build failure
         if: ${{ failure() }}
         run: |
-        cat /home/runner/.local/state/snapcraft/log/snapcraft*.log
-        exit 1
+          cat /home/runner/.local/state/snapcraft/log/snapcraft*.log
+          exit 1
 
       - name: Review snap
         uses: diddlesnaps/snapcraft-review-action@v1
         with:
-          snap: ${{ steps.build.outputs.snap }}
-          isClassic: 'true'
+          snap: ${{ steps.snapcraft.outputs.snap }}
+          isClassic: 'false'
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-        name: 'snap'
-        path: ${{ steps.snapcraft.outputs.snap}}
+          name: 'snap'
+          path: ${{ steps.snapcraft.outputs.snap}}
