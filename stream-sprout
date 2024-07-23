@@ -105,7 +105,7 @@ function get_stream_tee() {
     local URI=""
     local URI_ENV=""
     local KEY_ENV=""
-    parse_yaml "${STREAM_SPROUT_YAML}" sprout_ | grep '^sprout_services_.*_enabled=' | while read -r SERVICES; do
+    parse_yaml "${STREAM_SPROUT_CONFIG}" sprout_ | grep '^sprout_services_.*_enabled=' | while read -r SERVICES; do
         SERVICE=$(echo "${SERVICES}" | cut -d'_' -f3)
         ENABLED=$(echo "${SERVICES}" | cut -d'=' -f2 | tr -d \'\" )
         if [[ "${ENABLED,,}" == "true" || "${ENABLED}" == "1" ]]; then
