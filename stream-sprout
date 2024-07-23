@@ -8,8 +8,14 @@ readonly STREAM_SPROUT_YAML="stream-sprout.yaml"
 readonly VERSION="0.1.4"
 
 function ctrl_c() {
-    echo " - Trapped: CTRL-C"
-    pkill ffmpeg
+    echo -e " \e[31m\U26D4\e[0m CTRL-C"
+    sleep 0.25
+    if kill -0 "${FFMPEG_PID}" 2>/dev/null; then
+        echo -e " \e[31m\U1F480\e[0m FFmpeg process (${FFMPEG_PID})"
+        kill "${FFMPEG_PID}"
+    else
+        echo -e " \e[31m\U23F9\e[0m  FFmpeg process (${FFMPEG_PID}) has ended"
+    fi
     rename_archive
     exit
 }
@@ -168,7 +174,7 @@ while true; do
     # Monitor the FFmpeg process
     while sleep 1; do
         STAMP="[$(date +%H:%M:%S)]"
-        if ! ps -p "${FFMPEG_PID}" > /dev/null; then
+        if ! kill -0 "${FFMPEG_PID}" 2>/dev/null; then
             echo -e " \e[31m\U23F9\e[0m  FFmpeg process (${FFMPEG_PID}) has ended"
             break
         else
