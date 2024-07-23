@@ -30,7 +30,7 @@ Optionally you can also archive the stream to disk 💾
 While the restreaming process is lightweight, **your bandwidth requirements will increase with each destination you add.** 📈
 Ensure you have sufficient bandwidth to support the number of destinations you intend to stream to ⤴️
 
-Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any other platform that supports `bash`, `ffmpeg` and `yq` 👍️
+Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any other platform that supports `bash` and `ffmpeg` 👍️
 
 ## Get Started
 
@@ -47,17 +47,15 @@ Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any ot
 
 ### Debian
 
-Stream Sprout depends on `yq` and that is available in bullseye-backports, bookworm, trixie and newer.
-
 - Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
-- Install it with `apt-get install ./stream-sprout_0.1.0-1_all.deb`.
+- Install it with `apt-get install ./stream-sprout_0.1.3-1_all.deb`.
 
 ### macOS
 
 Install the Stream Sprout requirements using `brew`:
 
 ```shell
-brew install bash ffmpeg procps python-yq
+brew install bash ffmpeg procps
 ```
 
 Now clone the project:
@@ -76,18 +74,14 @@ See the flake on FlakeHub for more details:
 
 - <https://flakehub.com/flake/wimpysworld/stream-sprout>
 
-### Ubuntu 24.04 and newer
-
-Stream Sprout depends on `yq` and that has been available in Ubuntu since 23.10.
+### Ubuntu
 
 - Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
-- Install it with `apt-get install ./stream-sprout_0.1.0-1_all.deb`.
-
-For Ubuntu versions earlier than 24.04 you can [install Stream Sprout from source](#from-source).
+- Install it with `apt-get install ./stream-sprout_0.1.3-1_all.deb`.
 
 ### From source
 
-You need to have [FFmpeg](https://ffmpeg.org/) and [yq](https://github.com/kislyuk/yq) installed on your system.
+You need to have [FFmpeg](https://ffmpeg.org/) on your system.
 
 ```bash
 git clone https://github.com/wimpysworld/stream-sprout.git
