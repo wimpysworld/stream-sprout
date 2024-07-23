@@ -108,13 +108,11 @@ function get_stream_tee() {
     add_archive
 }
 
-# Check that ffmpeg and pkill are available on the PATH
-for CMD in ffmpeg pkill; do
-    if ! command -v "${CMD}" &> /dev/null; then
-        echo "ERROR! ${CMD} is not installed. Exiting."
-        exit 1
-    fi
-done
+# Check that ffmpeg  are available on the PATH
+if ! command -v ffmpeg &> /dev/null; then
+    echo -e " \e[31m\U1F6AB\e[0m ffmpeg is not installed. Exiting."
+    exit 1
+fi
 
 # Check in the current working directory
 if [ -f "./${STREAM_SPROUT_YAML}" ]; then
