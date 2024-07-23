@@ -99,7 +99,7 @@ function get_stream_tee() {
     add_archive
 }
 
-# Check that ffmpeg and yq are available on the PATH
+# Check that ffmpeg and pkill are available on the PATH
 for CMD in ffmpeg pkill; do
     if ! command -v "${CMD}" &> /dev/null; then
         echo "ERROR! ${CMD} is not installed. Exiting."
