@@ -57,7 +57,7 @@ Stream Sprout depends on `yq` and that is available in bullseye-backports, bookw
 Install the Stream Sprout requirements using `brew`:
 
 ```shell
-brew install bash ffmpeg procps yq
+brew install bash ffmpeg procps python-yq
 ```
 
 Now clone the project:
