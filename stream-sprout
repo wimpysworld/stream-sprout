@@ -158,7 +158,7 @@ while true; do
     fi
     STREAM_TEE=""
     get_stream_tee
-    FFMPEG_LOG=$(mktemp /tmp/ffmpeg.XXXXXX.log)
+    FFMPEG_LOG=$(mktemp /tmp/stream-sprout.XXXXXX.log)
     ffmpeg \
         -hide_banner \
         -flags +global_header \
