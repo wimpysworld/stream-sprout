@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2154
 
 readonly STREAM_SPROUT_YAML="stream-sprout.yaml"
 readonly VERSION="0.1.3-dev"
@@ -35,42 +36,30 @@ function parse_yaml() {
    }'
 }
 
-function get_archive_path() {
-    local ARCHIVE_PATH=""
-    ARCHIVE_PATH=$(yq -r ".server.archive_path" "${STREAM_SPROUT_CONFIG}")
-    # Expand any environment variables in the path
-    ARCHIVE_PATH=$(eval echo "${ARCHIVE_PATH}")
-    if [ -z "${ARCHIVE_PATH}" ]; then
-        echo "./"
-    else
-        mkdir -p "${ARCHIVE_PATH}" 2> /dev/null
-        echo "${ARCHIVE_PATH}"
-    fi
-}
-
 function rename_archive() {
     local STAMP=""
     # If there is a stream file, then rename it to the current date and time
-    if [ -e "${ARCHIVE_PATH}/${ARCHIVE_TEMP}" ]; then
+    if [ -e "${sprout_server_archive_path}/${sprout_server_archive_temp}" ]; then
         STAMP=$(date +%Y%m%d_%H%M%S)
-        echo " - Rename:  ${ARCHIVE_PATH}/${ARCHIVE_TEMP} to ${ARCHIVE_PATH}/stream-sprout-${STAMP}.mkv"
-        mv "${ARCHIVE_PATH}/${ARCHIVE_TEMP}" "${ARCHIVE_PATH}/stream-sprout-${STAMP}.mkv"
+        echo " - Rename:  ${sprout_server_archive_path}/${sprout_server_archive_temp} to ${sprout_server_archive_path}/stream-sprout-${STAMP}.mkv"
+        mv "${sprout_server_archive_path}/${sprout_server_archive_temp}" "${sprout_server_archive_path}/stream-sprout-${STAMP}.mkv"
     fi
 }
 
 function add_archive() {
-    local ARCHIVE_ENABLED=""
-    ARCHIVE_PATH="$(get_archive_path)"
-    ARCHIVE_TEMP="stream-temp-$(date +%s%N).mkv"
-
+    sprout_server_archive_temp="stream-temp-$(date +%s%N).mkv"
     # Check if recording is enabled in the YAML configuration
-    ARCHIVE_ENABLED=$(yq -r ".server.archive_stream" "${STREAM_SPROUT_CONFIG}")
-    if [[ "${ARCHIVE_ENABLED,,}" == "true" || "${ARCHIVE_ENABLED}" == "1" ]]; then
-        echo " - Archive: ${ARCHIVE_PATH}/${ARCHIVE_TEMP}"
+    if [[ "${sprout_server_archive_stream,,}" == "true" || "${sprout_server_archive_stream}" == "1" ]]; then
+        if [ -z "${sprout_server_archive_path}" ]; then
+            sprout_server_archive_path="$(dirname "${PWD}")"
+        else
+            mkdir -p "${sprout_server_archive_path}" 2> /dev/null
+        fi
+        echo " - Archive: ${sprout_server_archive_path}/${sprout_server_archive_temp}"
         if [ -n "${STREAM_TEE}" ]; then
             STREAM_TEE+="|"
         fi
-        STREAM_TEE+="[f=matroska]${ARCHIVE_PATH}/${ARCHIVE_TEMP}"
+        STREAM_TEE+="[f=matroska]${sprout_server_archive_path}/${sprout_server_archive_temp}"
     fi
 }
 
@@ -86,25 +75,24 @@ function add_service() {
 }
 
 function get_stream_tee() {
-    local SERVICE_ENABLED=""
-    local SERVICES=""
+    local SERVICE=""
     local URI=""
-
-    # Extract services from the YAML
-    SERVICES=$(yq -r '.services | keys | .[]' "${STREAM_SPROUT_CONFIG}")
-
-    # Iterate over each service
-    for SERVICE in ${SERVICES}; do
-        # Check if the service is enabled in the YAML configuration
-        SERVICE_ENABLED=$(yq -r ".services.${SERVICE}.enabled" "${STREAM_SPROUT_CONFIG}")
-        if [[ "${SERVICE_ENABLED,,}" == "true" || "${SERVICE_ENABLED}" == "1" ]]; then
+    local URI_ENV=""
+    local KEY_ENV=""
+    parse_yaml "${STREAM_SPROUT_YAML}" sprout_ | grep '^sprout_services_.*_enabled=' | while read -r SERVICES; do
+        SERVICE=$(echo "${SERVICES}" | cut -d'_' -f3)
+        ENABLED=$(echo "${SERVICES}" | cut -d'=' -f2 | tr -d \'\" )
+        if [[ "${ENABLED,,}" == "true" || "${ENABLED}" == "1" ]]; then
             echo " - Service: ${SERVICE}"
-            URI=$(yq -r ".services.${SERVICE}.rtmp_server" "${STREAM_SPROUT_CONFIG}")
+            # Construct the variable name
+            URI_ENV="sprout_services_${SERVICE}_rtmp_server"
+            KEY_ENV="sprout_services_${SERVICE}_key"
+            # Use indirect expansion to get the value
+            URI="${!URI_ENV}${!KEY_ENV}"
             if [[ ! "${URI}" =~ ^rtmp://.* ]]; then
-                echo " - Invalid URL:  ${SERVICE} is not a valid RTMP URL."
+                echo " - Invalid URL:  ${SERVICE} is not a valid RTMP URL"
                 return
             fi
-            URI+=$(yq -r ".services.${SERVICE}.key" "${STREAM_SPROUT_CONFIG}")
             add_service "${URI}"
         fi
     done
@@ -112,7 +100,7 @@ function get_stream_tee() {
 }
 
 # Check that ffmpeg and yq are available on the PATH
-for CMD in ffmpeg pkill yq; do
+for CMD in ffmpeg pkill; do
     if ! command -v "${CMD}" &> /dev/null; then
         echo "ERROR! ${CMD} is not installed. Exiting."
         exit 1
@@ -133,26 +121,20 @@ else
     exit 1
 fi
 
-# Check if the file is valid YAML
-if ! yq '.' "${STREAM_SPROUT_CONFIG}" &>/dev/null; then
-    echo "ERROR: ${STREAM_SPROUT_CONFIG} is not valid YAML."
-    exit 1
-fi
+eval "$(parse_yaml "${STREAM_SPROUT_YAML}" sprout_)"
 
 # trap ctrl-c and call ctrl_c() to clean up
 trap ctrl_c INT
 
 while true; do
     echo "Stream Sprout v${VERSION} using ${STREAM_SPROUT_CONFIG}"
-    SERVER_URL=$(yq -r ".server.url" "${STREAM_SPROUT_CONFIG}")
-    SERVER_KEY=$(yq -r ".server.key" "${STREAM_SPROUT_CONFIG}")
-    if [[ ! "${SERVER_URL}" =~ ^rtmp://.* ]]; then
-        echo " - Invalid URL:  ${SERVER_URL} is not a valid RTMP URL."
+    if [[ ! "${sprout_server_url}" =~ ^rtmp://.* ]]; then
+        echo " - Invalid URL:  ${sprout_server_url} is not a valid RTMP URL."
         exit 1
     fi
-    echo -n " - Server:  ${SERVER_URL}"
-    if [ "${SERVER_KEY}" != "null" ]; then
-        SERVER_URL+="/${SERVER_KEY}"
+    echo -n " - Server:  ${sprout_server_url}"
+    if [ -n "${sprout_server_key}" ]; then
+        sprout_server_url+="/${sprout_server_key}"
         echo " (key required)"
     else
         echo ""
@@ -163,7 +145,7 @@ while true; do
         -hide_banner \
         -flags +global_header \
         -fflags nobuffer \
-        -listen 1 -i "${SERVER_URL}?rtmp_buffer=0&rtmp_live=live" \
+        -listen 1 -i "${sprout_server_url}?rtmp_buffer=0&rtmp_live=live" \
         -flvflags no_duration_filesize \
         -c:v copy -c:a copy -map 0 \
         -movflags +faststart \
