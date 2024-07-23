@@ -128,12 +128,11 @@ else
     exit 1
 fi
 
-eval "$(parse_yaml "${STREAM_SPROUT_YAML}" sprout_)"
-
 # trap ctrl-c and call ctrl_c() to clean up
 trap ctrl_c INT
 
 while true; do
+    eval "$(parse_yaml "${STREAM_SPROUT_YAML}" sprout_)"
     echo "Stream Sprout v${VERSION} using ${STREAM_SPROUT_CONFIG}"
     if [[ ! "${sprout_server_url}" =~ ^rtmp://.* ]]; then
         echo " - Invalid URL:  ${sprout_server_url} is not a valid RTMP URL."
