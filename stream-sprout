@@ -2,7 +2,7 @@
 # shellcheck disable=SC2154
 
 readonly STREAM_SPROUT_YAML="stream-sprout.yaml"
-readonly VERSION="0.1.3-dev"
+readonly VERSION="0.1.3"
 
 function ctrl_c() {
     echo " - Trapped: CTRL-C"
