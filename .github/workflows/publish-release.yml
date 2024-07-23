@@ -39,6 +39,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: "Build .deb 🍥"
+      env:
+        DEBFULLNAME: "Martin Wimpress"
+        DEBEMAIL: "code@wimpress.io"
       run: |
         sudo apt-get -y update
         sudo apt-get -y install debhelper devscripts
