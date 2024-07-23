@@ -6,8 +6,10 @@
 mkShell {
   packages = with pkgs; ([
     ffmpeg-headless
+    gnugrep
+    gnused
+    mawk
     procps
-    yq
   ]);
 
   shellHook = ''

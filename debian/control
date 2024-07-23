@@ -15,8 +15,10 @@ Architecture: all
 Depends:
  coreutils,
  ffmpeg,
+ grep,
+ mawk,
  procps,
- yq,
+ sed,
  ${misc:Depends},
  ${shlibs:Depends},
 Description: Restream a video source to multiple destinations such as Twitch, YouTube, Owncast and Peertube.
