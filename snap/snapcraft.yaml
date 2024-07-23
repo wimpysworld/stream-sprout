@@ -25,6 +25,8 @@ parts:
     after: [ deps ]
     plugin: dump
     source: .
+    build-packages:
+      - git
     override-pull: |
       craftctl default
       craftctl set version=$(git describe --tags --abbrev=0).$(git rev-parse --short HEAD)    
