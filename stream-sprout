@@ -8,10 +8,10 @@ readonly STREAM_SPROUT_YAML="stream-sprout.yaml"
 readonly VERSION="0.1.4"
 
 function ctrl_c() {
-    echo -e " \e[31m\U26D4\e[0m CTRL-C"
+    echo -e " \e[31m\U26D4\e[0m Control-C"
     sleep 0.25
     if kill -0 "${FFMPEG_PID}" 2>/dev/null; then
-        echo -e " \e[31m\U1F480\e[0m FFmpeg process (${FFMPEG_PID})"
+        echo -e " \e[31m\U1F480\e[0m FFmpeg process (${FFMPEG_PID}) has been terminated"
         kill "${FFMPEG_PID}"
     else
         echo -e " \e[31m\U23F9\e[0m  FFmpeg process (${FFMPEG_PID}) has ended"
@@ -50,7 +50,8 @@ function rename_archive() {
     # If there is a stream file, then rename it to the current date and time
     if [ -e "${sprout_server_archive_path}/${sprout_server_archive_temp}" ]; then
         STAMP=$(date +%Y%m%d_%H%M%S)
-        echo " - Rename:  ${sprout_server_archive_path}/${sprout_server_archive_temp} to ${sprout_server_archive_path}/stream-sprout-${STAMP}.mkv"
+        echo -e " \U1F500 ${sprout_server_archive_path}/${sprout_server_archive_temp}"
+        echo -e "    \U21AA ${sprout_server_archive_path}/stream-sprout-${STAMP}.mkv"
         mv "${sprout_server_archive_path}/${sprout_server_archive_temp}" "${sprout_server_archive_path}/stream-sprout-${STAMP}.mkv"
     fi
 }
@@ -62,9 +63,9 @@ function add_archive() {
         if [ -z "${sprout_server_archive_path}" ]; then
             sprout_server_archive_path="$(dirname "${PWD}")"
         else
-            mkdir -p "${sprout_server_archive_path}" 2> /dev/null
+            mkdir -p "${sprout_server_archive_path}" 2>/dev/null
         fi
-        echo " - Archive: ${sprout_server_archive_path}/${sprout_server_archive_temp}"
+        echo -e " \e[34m\U1F4BE\e[0m ${sprout_server_archive_path}/${sprout_server_archive_temp}"
         if [ -n "${STREAM_TEE}" ]; then
             STREAM_TEE+="|"
         fi
@@ -92,14 +93,14 @@ function get_stream_tee() {
         SERVICE=$(echo "${SERVICES}" | cut -d'_' -f3)
         ENABLED=$(echo "${SERVICES}" | cut -d'=' -f2 | tr -d \'\" )
         if [[ "${ENABLED,,}" == "true" || "${ENABLED}" == "1" ]]; then
-            echo " - Service: ${SERVICE}"
+            echo -e " \e[35m\U1F4E1\e[0m ${SERVICE}"
             # Construct the variable name
             URI_ENV="sprout_services_${SERVICE}_rtmp_server"
             KEY_ENV="sprout_services_${SERVICE}_key"
             # Use indirect expansion to get the value
             URI="${!URI_ENV}${!KEY_ENV}"
             if [[ ! "${URI}" =~ ^rtmp://.* ]]; then
-                echo " - Invalid URL:  ${SERVICE} is not a valid RTMP URL"
+                echo -e " \e[31m\U1F6AB\e[0m ${SERVICE} is not a valid RTMP service URL"
                 return
             fi
             add_service "${URI}"
@@ -124,7 +125,7 @@ elif [ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/${STREAM_SPROUT_YAML}" ]; then
 elif [ -f "/etc/${STREAM_SPROUT_YAML}" ]; then
     STREAM_SPROUT_CONFIG="/etc/${STREAM_SPROUT_YAML}"
 else
-    echo "ERROR: ${STREAM_SPROUT_YAML} was not found."
+    echo -e " \e[31m\U1F6AB\e[0m ${STREAM_SPROUT_YAML} was not found. Exiting."
     exit 1
 fi
 
@@ -135,10 +136,10 @@ while true; do
     eval "$(parse_yaml "${STREAM_SPROUT_YAML}" sprout_)"
     echo "Stream Sprout v${VERSION} using ${STREAM_SPROUT_CONFIG}"
     if [[ ! "${sprout_server_url}" =~ ^rtmp://.* ]]; then
-        echo " - Invalid URL:  ${sprout_server_url} is not a valid RTMP URL."
+        echo -e " \e[31m\U1F6AB\e[0m ${sprout_server_url} is not a valid RTMP server URL."
         exit 1
     fi
-    echo -n " - Server:  ${sprout_server_url}"
+    echo -en " \e[36m\U1F310\e[0m ${sprout_server_url}"
     if [ -n "${sprout_server_key}" ]; then
         sprout_server_url+="/${sprout_server_key}"
         echo " (key required)"
@@ -172,7 +173,7 @@ while true; do
     while sleep 1; do
         STAMP="[$(date +%H:%M:%S)]"
         if ! kill -0 "${FFMPEG_PID}" 2>/dev/null; then
-            echo -e " \e[31m\U23F9\e[0m  FFmpeg process (${FFMPEG_PID}) has ended"
+            echo -e " \e[31m\U23F9\e[0m  FFmpeg has ended"
             break
         else
             if grep "Input #0, flv, from 'rtmp://" "${FFMPEG_LOG}" > /dev/null; then
@@ -184,9 +185,9 @@ while true; do
             # Check if status changed or if it's time to log the status again
             if [[ ${NEW_STATUS} -ne ${STREAMING_STATUS} ]] || (( COUNTER % 30 == 0 )); then
                 if [[ ${NEW_STATUS} -eq 1 ]]; then
-                    echo -e " \e[32m\U25B6\e[0m  FFmpeg process (${FFMPEG_PID}) is streaming   ${STAMP}"
+                    echo -e " \e[32m\U25B6\e[0m  FFmpeg is streaming   ${STAMP}"
                 else
-                    echo -e " \e[33m\U23F8\e[0m  FFmpeg process (${FFMPEG_PID}) is standing-by ${STAMP}"
+                    echo -e " \e[33m\U23F8\e[0m  FFmpeg is standing-by ${STAMP}"
                 fi
                  # Update the current status
                 STREAMING_STATUS=${NEW_STATUS}
