@@ -106,6 +106,8 @@ function get_stream_tee() {
     local SERVICE_NAME=""
     local SERVICE_RTMP=""
     local URI=""
+
+    STREAM_TEE=""
     # Iterate over all the sprout_services variables
     for var in "${!sprout_services@}"; do
         # Check the variable matches the pattern: sprout_services_*_enabled
@@ -139,6 +141,52 @@ function get_stream_tee() {
         fi
     done
     add_archive
+}
+
+function get_server_url() {
+    local asterisks=""
+    local key_length=0
+    # Check if the sprout_server_url is set and display a deprecation notice if it is
+    if [ -n "${sprout_server_url}" ]; then
+        echo -e " \e[31m\U1F6AB\e[0m server:"
+        echo -e "         ╰─url: in the YAML is deprecated. Please configure ip: and port: instead."
+        exit 1
+    fi
+    # Validate the sprout_server_ip is valid
+    if [[ ! "${sprout_server_ip}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo -e " \e[33m\U26A0\e[0m  server:"
+        echo -e "         ╰─ip: in the YAML is not valid. Falling back to '127.0.0.1'."
+        sprout_server_ip="127.0.0.1"
+    fi
+    # Validate the sprout_server_port is valid
+    if [[ ! "${sprout_server_port}" =~ ^[0-9]+$ ]] || [[ "${sprout_server_port}" -lt 1024 ]] || [[ "${sprout_server_port}" -gt 65535 ]]; then
+        echo -e " \e[33m\U26A0\e[0m  server:"
+        echo -e "         ╰─port: in the YAML is not valid. Must be between 1024 and 65535. Falling back to '1935'."
+        sprout_server_port="1935"
+    fi
+    # Check that sprout_server_app is not empty
+    if [ -z "${sprout_server_app}" ]; then
+        echo -e " \e[33m\U26A0\e[0m  server:"
+        echo -e "         ╰─app: is not configured in the YAML. Falling back to 'sprout'."
+        sprout_server_app="sprout"
+    fi
+    # Check that sprout_server_key is not empty
+    if [ -z "${sprout_server_key}" ]; then
+        echo -e " \e[33m\U26A0\e[0m  server:"
+        echo -e "         ╰─key: is not configured in the YAML. \e[1;97mYour Stream Sprout server is unprotected.\e[0m"
+    fi
+    sprout_server_url="rtmp://${sprout_server_ip}:${sprout_server_port}/${sprout_server_app}"
+    if [ -n "${sprout_server_key}" ]; then
+        # Calculate the length of sprout_server_key
+        key_length=${#sprout_server_key}
+        # Create a string of asterisks equal to the length of sprout_server_key
+        asterisks=$(printf "%*s" "${key_length}" "" | tr ' ' '*')
+        echo -e " \e[36m\U1F310\e[0m ${sprout_server_url}/${asterisks}"
+        # Append the sprout_server_key to the sprout_server_url
+        sprout_server_url+="/${sprout_server_key}"
+    else
+        echo -e " \e[36m\U1F310\e[0m ${sprout_server_url}"
+    fi
 }
 
 function stream_details() {
@@ -237,18 +285,7 @@ while true; do
     eval "$(parse_yaml "${STREAM_SPROUT_CONFIG}" sprout_)"
     show_version
     echo -e " \U2699  ${STREAM_SPROUT_CONFIG}"
-    if [[ ! "${sprout_server_url}" =~ ^rtmp://.* ]]; then
-        echo -e " \e[31m\U1F6AB\e[0m ${sprout_server_url} is not a valid RTMP server URL."
-        exit 1
-    fi
-    echo -en " \e[36m\U1F310\e[0m ${sprout_server_url}"
-    if [ -n "${sprout_server_key}" ]; then
-        sprout_server_url+="/${sprout_server_key}"
-        echo " (key required)"
-    else
-        echo ""
-    fi
-    STREAM_TEE=""
+    get_server_url
     get_stream_tee
     FFMPEG_LOG=$(mktemp /tmp/stream-sprout.XXXXXX.log)
     ffmpeg \
@@ -304,4 +341,5 @@ while true; do
     done
     rename_archive
     echo
+    unset sprout_server_url
 done
