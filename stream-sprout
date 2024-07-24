@@ -293,7 +293,7 @@ while true; do
         -hide_banner \
         -flags +global_header \
         -fflags nobuffer \
-        -listen 1 -i "${sprout_server_url}?rtmp_buffer=0&rtmp_live=live" \
+        -listen 1 -i "${sprout_server_url}" \
         -flvflags no_duration_filesize \
         -c:v copy -c:a copy -map 0 \
         -movflags +faststart \
