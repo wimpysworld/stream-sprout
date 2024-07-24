@@ -29,7 +29,7 @@ parts:
       - git
     override-pull: |
       craftctl default
-      craftctl set version=$(git describe --tags --abbrev=0).$(git rev-parse --short HEAD)    
+      craftctl set version=$(git describe --tags --abbrev=0).$(git rev-parse --short HEAD)
     prime:
       - stream-sprout
       - stream-sprout.yaml.example
