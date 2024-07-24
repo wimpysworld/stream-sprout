@@ -1,0 +1,56 @@
+name: stream-sprout
+base: core24
+adopt-info: stream-sprout
+summary: Restream video to multiple destinations
+description: |
+  Restream a video source to multiple destinations such as Twitch, YouTube,
+  and Owncast
+
+grade: stable
+confinement: strict
+
+platforms:
+  amd64:
+    build-on: [ amd64 ]
+    build-for: [ amd64 ]
+  arm64:
+    build-on: [ arm64 ]
+    build-for:  [arm64 ]
+  armhf:
+    build-on: [ armhf ]
+    build-for: [ armhf ]
+
+parts:
+  stream-sprout:
+    after: [ deps ]
+    plugin: dump
+    source: .
+    build-packages:
+      - git
+    override-pull: |
+      craftctl default
+      craftctl set version=$(git describe --tags --abbrev=0).$(git rev-parse --short HEAD)    
+    prime:
+      - stream-sprout
+      - stream-sprout.yaml.example
+      - LICENSE
+      - SECURITY.md
+
+  deps:
+    plugin: nil
+    stage-packages:
+      - ffmpeg
+      - sed
+      - awk
+      - grep
+
+apps:
+  stream-sprout:
+    command: stream-sprout
+    environment:
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_BUILD_FOR/pulseaudio:$SNAP/usr/lib/$CRAFT_ARCH_BUILD_FOR/blas:$SNAP/usr/lib/$CRAFT_ARCH_BUILD_FOR/lapack
+    plugs:
+      - home
+      - removable-media
+      - network-bind
+      - network
