@@ -78,6 +78,16 @@ See the flake on FlakeHub for more details:
 
 - <https://flakehub.com/flake/wimpysworld/stream-sprout>
 
+### Snap
+
+[![stream-sprout](https://snapcraft.io/stream-sprout/badge.svg)](https://snapcraft.io/stream-sprout)
+
+For Linux distributions that support snap packages, Stream Sprout is available from the Snap Store 🛍️
+
+```shell
+sudo snap install stream-sprout
+```
+
 ### Ubuntu
 
 - Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
