@@ -52,7 +52,7 @@ Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any ot
 ### Debian
 
 - Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
-- Install it with `apt-get install ./stream-sprout_0.1.4-1_all.deb`.
+- Install it with `apt-get install ./stream-sprout_0.1.5-1_all.deb`.
 
 ### macOS
 
@@ -81,7 +81,7 @@ See the flake on FlakeHub for more details:
 ### Ubuntu
 
 - Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
-- Install it with `apt-get install ./stream-sprout_0.1.4-1_all.deb`.
+- Install it with `apt-get install ./stream-sprout_0.1.5-1_all.deb`.
 
 ### Docker & Podman
 
@@ -97,7 +97,7 @@ docker pull ghcr.io/wimpysworld/stream-sprout:latest
 Or if you want a specific version:
 
 ```shell
-docker pull ghcr.io/wimpysworld/stream-sprout:0.1.4
+docker pull ghcr.io/wimpysworld/stream-sprout:0.1.5
 ```
 
 #### Run the container
