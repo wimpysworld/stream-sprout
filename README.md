@@ -151,23 +151,30 @@ If you don't specify a configuration file, Stream Sprout will look for a configu
 
 ### Server
 
+Here's an example configuration for the Stream Sprout `server:` section.
+
 ```yaml
 server:
-  url: "rtmp://127.0.0.1:1935"
+  ip: 127.0.0.1
+  port: 1935
+  app: sprout
   key: "create your key with uuidgen here"
   archive_stream: false
   archive_path: "${HOME}/Streams"
 ```
 
-The `server:` section is used to configure the RTMP server that Stream Sprout creates; it must be an RTMP URL.
-The default port for RTMP is `1935`, but you can use any port you like.
-If you remotely host Stream Sprout, you should use an IP address in the `url:` that accessible by your computer that runs OBS Studio and also set `key:` to a secure value to prevent unauthorized access.
-Running `uuidgen` will generate a suitable value.
+The `server:` section is used to configure the RTMP server that Stream Sprout creates.
+- The default `ip` address is `127.0.0.1`. Use `0.0.0.0` to allow connections to any network interface.
+  - If you remotely host Stream Sprout, use an IP address that is accessible by your computer that runs OBS Studio.
+- The default `port` for RTMP is `1935`, but you can use any port between `1024` and `65535`.
+- The default `app` name is `sprout`, but you can use any name you like.
+- Set `key:` to a secure value to prevent unauthorized access. Running `uuidgen` will generate a suitable value.
+
+The IP address, port, app name and key are composed to create the RTMP URL that you will use in OBS Studio.
+For example, `rtmp://ip:port/app/key`.
 
 If `archive_stream:` is `true` Stream Sprout will archive the stream to disk in the directory specified by `archive_path:`.
 If `archive_path:` is not accessible, Stream Sprout will fallback to using the current working directory.
-
-Here's an example configuration for the Stream Sprout `server:` section.
 
 ### Services
 
@@ -227,7 +234,7 @@ services:
 - Go to `Settings` > `Stream`
 - Select `Custom` from the `Service` dropdown
 - Copy the server `url:` from your Stream Sprout configuration to the `Server` field:
-  - `rtmp://127.0.0.1:1935` (*default*)
+  - `rtmp://127.0.0.1:1935/sprout` (*default*)
 - Copy the `key:` (if you specified one) from your Stream Sprout configuration to the `Stream Key` field
 
 ![OBS Studio Stream Settings](.github/obs-settings.png)
@@ -236,6 +243,7 @@ services:
 
 - Stream Sprout does not support secure RTMP (RTMPS) at this time.
   - *At least I don't think it does, but I haven't fully tested it.*
+  - https://superuser.com/questions/1438939/live-streaming-over-rtmps-using-ffmpeg
 - Each destination you add will increase your bandwidth requirements.
 
 ## References
