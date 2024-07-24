@@ -41,7 +41,7 @@ parts:
     stage-packages:
       - ffmpeg
       - sed
-      - awk
+      - mawk
       - grep
 
 apps:
