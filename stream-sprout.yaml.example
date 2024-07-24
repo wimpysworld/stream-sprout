@@ -1,5 +1,7 @@
 server:
-  url: "rtmp://127.0.0.1:1935"
+  ip: 127.0.0.1
+  port: 1935
+  app: sprout
   key: "create your key with uuidgen here"
   archive_stream: false
   archive_path: "${HOME}/Streams"
