@@ -23,9 +23,9 @@ Stream Sprout 🌱 is a simple, self-contained, and easy-to-use solution for str
   <img src=".github/demo.gif" alt="Stream Sprout" width="505" height="415"/>
 </div>
 
-It uses [FFmpeg](https://ffmpeg.org/) to receive the video stream from OBS Studio (or anything that can publish a RTMP stream) and then restreams it to multiple destinations; providing similar functionality as services like Restream.io and Livepush.io but without the need to pay 💸 for a third-party service or run something like nginx with the [RTMP module](https://github.com/arut/nginx-rtmp-module).
+It uses [FFmpeg](https://ffmpeg.org/) to receive the video stream from OBS Studio (or any encoder that can produce RTMP) and then restreams it to multiple destinations. This provides similar functionality as services like Restream.io and Livepush.io but without the need to pay 💸 for a third-party service or run something like nginx with the [RTMP module](https://github.com/arut/nginx-rtmp-module).
 
-Stream Sprout is configured with a simple YAML file and designed to be run on the same computer as your [OBS Studio](https://obsproject.com/) instance (it can be run remotely too) and does not require root privileges.
+Stream Sprout is configured with a simple YAML file and designed to be run on the same computer as your [OBS Studio](https://obsproject.com/) instance (it can be run remotely, too) and does not require root privileges.
 
 There is no transcoding or processing of the video stream 🎞️
 The stream is received and then restreamed to the destinations you configure without modification.
@@ -97,7 +97,7 @@ sudo snap install stream-sprout
 
 #### Pull the container
 
-The Stream Sprout container image is available from the GitHub Container Registry.
+The Stream Sprout container image is available from the GitHub Container Registry for amd64 and arm64.
 To pull the latest container image:
 
 ```shell
