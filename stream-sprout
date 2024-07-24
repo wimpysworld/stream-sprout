@@ -101,25 +101,41 @@ function add_service() {
 }
 
 function get_stream_tee() {
-    local SERVICE=""
+    local SERVICE_ENABLED=""
+    local SERVICE_KEY=""
+    local SERVICE_NAME=""
+    local SERVICE_RTMP=""
     local URI=""
-    local URI_ENV=""
-    local KEY_ENV=""
-    parse_yaml "${STREAM_SPROUT_CONFIG}" sprout_ | grep '^sprout_services_.*_enabled=' | while read -r SERVICES; do
-        SERVICE=$(echo "${SERVICES}" | cut -d'_' -f3)
-        ENABLED=$(echo "${SERVICES}" | cut -d'=' -f2 | tr -d \'\" )
-        if [[ "${ENABLED,,}" == "true" || "${ENABLED}" == "1" ]]; then
-            echo -e " \e[35m\U1F4E1\e[0m ${SERVICE}"
-            # Construct the variable name
-            URI_ENV="sprout_services_${SERVICE}_rtmp_server"
-            KEY_ENV="sprout_services_${SERVICE}_key"
-            # Use indirect expansion to get the value
-            URI="${!URI_ENV}${!KEY_ENV}"
-            if [[ ! "${URI}" =~ ^rtmp://.* ]]; then
-                echo -e " \e[31m\U1F6AB\e[0m ${SERVICE} is not a valid RTMP service URL"
-                return
+    # Iterate over all the sprout_services variables
+    for var in "${!sprout_services@}"; do
+        # Check the variable matches the pattern: sprout_services_*_enabled
+        if [[ "${var}" =~ ^sprout_services_.*_enabled$ ]]; then
+            # Derive the service name
+            # - First remove `sprout_services_` prefix from the beginning of the value stored in the variable $var.
+            # - Next remove the suffix `_enabled` from the end of the SERVICE_NAME variable's value.
+            SERVICE_NAME="${var#sprout_services_}"
+            SERVICE_NAME="${SERVICE_NAME%_enabled}"
+            # Get the value of the variable $var
+            SERVICE_ENABLED="${!var}"
+            if [[ "${SERVICE_ENABLED,,}" == "true" || "${SERVICE_ENABLED}" == "1" ]]; then
+                echo -e " \e[35m\U1F4E1\e[0m ${SERVICE_NAME}"
+                # TODO: This assumes that the RTMP URL and key are set in the YAML file.
+                # Construct the variable name
+                SERVICE_RTMP="sprout_services_${SERVICE_NAME}_rtmp_server"
+                SERVICE_KEY="sprout_services_${SERVICE_NAME}_key"
+                # Use indirect expansion to get the value
+                # By concatenating these two indirectly referenced values, URI
+                # is set to the full URI needed for streaming. For instance, if
+                # SERVICE_RTMP points to a variable holding rtmp://example.com/live
+                # and SERVICE_KEY points to a variable holding abcd1234, then URI
+                # would be set to rtmp://example.com/live/abcd1234.
+                URI="${!SERVICE_RTMP}/${!SERVICE_KEY}"
+                if [[ ! "${URI}" =~ ^rtmp://.* ]]; then
+                    echo -e " \e[31m\U1F6AB\e[0m ${SERVICE_NAME} is not a valid RTMP service URL"
+                    continue
+                fi
+                add_service "${URI}"
             fi
-            add_service "${URI}"
         fi
     done
     add_archive
