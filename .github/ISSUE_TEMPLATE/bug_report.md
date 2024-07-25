@@ -21,21 +21,25 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Stream Sprout output**
-Run `stream-sprout` and include the output of the failure below:
+**Stream Sprout output and logs**
+Run `stream-sprout` and include the output, along with **redacted logs** (*remove your IP address and keys*), and wrap it in the collapsible markdown section below.
 
 <details>
   <summary>Stream Sprout output</summary>
 
   ```text
-  stream-sprout output here
+  stream-sprout output from the time of the error here
+  ```
+
+  <summary>Stream Sprout logs</summary>
+
+  ```text
+  stream-sprout logs from the time of the error here
   ```
 </details>
 
 **System information**
-- OS: [e.g. Ubuntu 20.04]
-- stream-sprout version: [e.g. 0.1.0]
-- FFmpeg version: [e.g. 4.2.4]
+Run `stream-sprout --info` and include the output here.
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
