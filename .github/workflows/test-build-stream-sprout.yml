@@ -78,6 +78,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get stream-sprout version 🔢
+        id: get_version
+        run: |
+          STREAM_SPROUT_VER=$(grep "^readonly VERSION" stream-sprout | cut -d'"' -f2)
+          echo "STREAM_SPROUT_VER=$STREAM_SPROUT_VER" >> $GITHUB_ENV
       - name: "Build Container 🐋"
         uses: docker/build-push-action@v6
         with:
@@ -86,7 +91,7 @@ jobs:
           push: false
           tags: |
             ghcr.io/${{ github.repository }}:latest-alpine
-            ghcr.io/${{ github.repository }}:${{ github.ref_name }}-alpine
+            ghcr.io/${{ github.repository }}:${{ env.STREAM_SPROUT_VER }}-alpine
             ghcr.io/${{ github.repository }}:${{ github.sha }}-alpine
           platforms: linux/amd64, linux/arm64
       - name: Logout from Container Registry
