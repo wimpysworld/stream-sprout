@@ -25,7 +25,7 @@ Stream Sprout 🌱 is a simple, self-contained, and easy-to-use solution for str
 
 It uses [FFmpeg](https://ffmpeg.org/) to receive the video stream from OBS Studio (or any encoder that can produce RTMP) and then restreams it to multiple destinations. This provides similar functionality as services like Restream.io and Livepush.io but without the need to pay 💸 for a third-party service or run something like nginx with the [RTMP module](https://github.com/arut/nginx-rtmp-module).
 
-Stream Sprout is configured with a simple YAML file and designed to be run on the same computer as your [OBS Studio](https://obsproject.com/) instance (it can be run remotely, too) and does not require root privileges.
+Stream Sprout is configured with a simple YAML file and designed to be run on the same computer as your [OBS Studio](https://obsproject.com/) instance (it can be run remotely, [**with appropriate security measures**](#-ffmpeg-rtmp-server-accepts-any-rtmp-stream-on-the-listening-port-), and does not require root privileges.
 
 There is no transcoding or processing of the video stream 🎞️
 The stream is received and then restreamed to the destinations you configure without modification.
@@ -168,9 +168,9 @@ server:
   ip: 127.0.0.1
   port: 1935
   app: sprout
-  key: "create your key with uuidgen here"
+  key: create your key with uuidgen here
   archive_stream: false
-  archive_path: "${HOME}/Streams"
+  archive_path: ~/Streams
 ```
 
 The `server:` section is used to configure the RTMP server that Stream Sprout creates.
@@ -182,6 +182,18 @@ The `server:` section is used to configure the RTMP server that Stream Sprout cr
 
 The IP address, port, app name and key are composed to create the RTMP URL that you will use in OBS Studio.
 For example, `rtmp://ip:port/app/key`.
+
+### 🚨 FFMPEG WILL ACCEPT ANY RTMP STREAM ON THE CORRECT PORT 🚨
+
+**FFmpeg does not currently enforce `app` or `key` paths for its incoming RTMP server.**
+**Regardless of the `app` or `key` you set in the Stream Sprout YAML FFmpeg will accept *any* incoming stream on the correct `port`**
+
+⚠️ Do not expose the Stream Sprout RTMP server to the public internet without additional security measures ⚠️
+- Consider using a VPN or SSH tunnel to secure the connection 🔐
+- Or firewall the RTMP port to only allow connections from trusted IP addresses 🔥🧱
+- See the [Limitations section](#limitations) section below for more information.
+
+#### Archive streams
 
 If `archive_stream:` is `true` Stream Sprout will archive the stream to disk in the directory specified by `archive_path:`.
 If `archive_path:` is not accessible, Stream Sprout will fallback to using the current working directory.
@@ -251,8 +263,17 @@ services:
 
 ## Limitations
 
-- Stream Sprout does not support secure RTMP (RTMPS) at this time.
+- Protecting the Stream Sprout RTMP server with a key does not work
+  - FFmpeg does not currently support enforcing RTMP stream app paths or keys
+  - https://www.reddit.com/r/ffmpeg/comments/s4keuu/enforce_rtmp_stream_keys_and_strict_paths/
+  - https://patchwork.ffmpeg.org/project/ffmpeg/patch/20190925185708.70924-1-unique.will.martin@gmail.com/
+```
+  [rtmp @ 0x2ca9be80] Unexpected stream STREAMBOMB, expecting c5b559b2-589d-4925-a28e-20d1954fd6c5
+    Last message repeated 1 times
+```
+- Stream Sprout does not support restreaming using secure RTMP (RTMPS).
   - *At least I don't think it does, but I haven't fully tested it.*
+    - Kick only appears to support rtmps:// URLs and Stream Sprout restreams do not appear on Kick.
   - https://superuser.com/questions/1438939/live-streaming-over-rtmps-using-ffmpeg
 - Each destination you add will increase your bandwidth requirements.
 
