@@ -10,6 +10,7 @@ on:
       - flake.nix
       - package.nix
       - Containerfile
+      - snap/snapcraft.yaml
   push:
     branches:
       - main
@@ -19,6 +20,7 @@ on:
       - flake.nix
       - package.nix
       - Containerfile
+      - snap/snapcraft.yaml
   workflow_dispatch:
 
 # TODO: arm64 runner
@@ -88,3 +90,26 @@ jobs:
           platforms: linux/amd64, linux/arm64
       - name: Logout from Container Registry
         run: docker logout ghcr.io
+
+  test-snap-build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout 🥡
+        uses: actions/checkout@v4
+      - name: Build snap 🐊
+        uses: snapcore/action-build@v1
+        id: snapcraft
+      - name: Show log 🪵
+        if: ${{ failure() }}
+        run: |
+          cat /home/runner/.local/state/snapcraft/log/snapcraft*.log
+      - name: Review snap 🕵️
+        uses: diddlesnaps/snapcraft-review-action@v1
+        with:
+          snap: ${{ steps.snapcraft.outputs.snap }}
+          isClassic: false
+      - name: Upload artifacts ⤴️
+        uses: actions/upload-artifact@v2
+        with:
+          name: snap
+          path: ${{ steps.snapcraft.outputs.snap}}
