@@ -2,20 +2,20 @@ server:
   ip: 127.0.0.1
   port: 1935
   app: sprout
-  key: "create your key with uuidgen here"
+  key: create your key with uuidgen here
   archive_stream: false
   archive_path: ~/Streams
 
 services:
   trovo:
     enabled: false
-    rtmp_server: "rtmp://livepush.trovo.live/live/"
-    key: "your_trovo_stream_key"
+    rtmp_server: rtmp://livepush.trovo.live/live/
+    key: your_trovo_stream_key
   twitch:
     enabled: true
-    rtmp_server: "rtmp://live.twitch.tv/app/"
-    key: "your_twitch_stream_key"
+    rtmp_server: rtmp://live.twitch.tv/app/
+    key: your_twitch_stream_key
   youtube:
     enabled: true
-    rtmp_server: "rtmp://a.rtmp.youtube.com/live2/"
-    key: "your_youtube_stream_key"
+    rtmp_server: rtmp://a.rtmp.youtube.com/live2/
+    key: your_youtube_stream_key
