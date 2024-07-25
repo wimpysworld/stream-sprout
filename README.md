@@ -101,13 +101,13 @@ The Stream Sprout container image is available from the GitHub Container Registr
 To pull the latest container image:
 
 ```shell
-docker pull ghcr.io/wimpysworld/stream-sprout:latest
+docker pull ghcr.io/wimpysworld/stream-sprout:latest-alpine
 ```
 
 Or if you want a specific version:
 
 ```shell
-docker pull ghcr.io/wimpysworld/stream-sprout:0.1.5
+docker pull ghcr.io/wimpysworld/stream-sprout:0.1.5-alpine
 ```
 
 #### Run the container
@@ -123,7 +123,7 @@ docker run -p 1935:1935 -it -v $PWD:/data stream-sprout --config /data/stream-sp
 If you have not pulled or built the container image, you can run Stream Sprout with:
 
 ```shell
-docker run -p 1935:1935 -it -v $PWD:/data ghcr.io/wimpysworld/stream-sprout:latest --config /data/stream-sprout.yaml
+docker run -p 1935:1935 -it -v $PWD:/data ghcr.io/wimpysworld/stream-sprout:alpine-latest --config /data/stream-sprout.yaml
 ```
 
 - The `-p 1935:1935` part will expose the RTMP server port `1935` on the host computer.

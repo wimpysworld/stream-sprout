@@ -85,8 +85,9 @@ jobs:
           file: ./Containerfile
           push: false
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:latest-alpine
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}-alpine
+            ghcr.io/${{ github.repository }}:${{ github.sha }}-alpine
           platforms: linux/amd64, linux/arm64
       - name: Logout from Container Registry
         run: docker logout ghcr.io
