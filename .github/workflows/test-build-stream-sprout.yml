@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/*.yml
       - stream-sprout
       - debian/**
       - flake.nix
@@ -15,6 +16,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/*.yml
       - stream-sprout
       - debian/**
       - flake.nix
