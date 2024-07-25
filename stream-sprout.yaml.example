@@ -4,7 +4,7 @@ server:
   app: sprout
   key: "create your key with uuidgen here"
   archive_stream: false
-  archive_path: "${HOME}/Streams"
+  archive_path: ~/Streams
 
 services:
   trovo:
