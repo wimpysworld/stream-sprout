@@ -111,5 +111,5 @@ jobs:
       - name: Upload artifacts ⤴️
         uses: actions/upload-artifact@v2
         with:
-          name: snap
+          name: stream-sprout-snap
           path: ${{ steps.snapcraft.outputs.snap}}
