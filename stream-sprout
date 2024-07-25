@@ -28,8 +28,59 @@ function show_help() {
     echo ""
     echo "Options:"
     echo "  --config <path>    Specify a custom config file path."
+    echo "  --info             Show system information; useful when filing bug reports."
     echo "  --version          Show version information."
     echo "  --help             Display this help message."
+}
+
+function show_info() {
+    local CONTAINER_ENV
+    local CONTAINER_RUNTIME
+    local CONTAINER_RUNTIMES=("docker" "lxc" "podman")
+    local OS_KERNEL
+    local PRETTY_NAME
+    OS_KERNEL=$(uname -s)
+
+    if [ "${OS_KERNEL}" == "Darwin" ]; then
+        # Get macOS product name and version using swvers
+        if [ -x "$(command -v sw_vers)" ]; then
+            PRETTY_NAME="$(sw_vers -productName) $(sw_vers -productVersion)"
+        else
+            PRETTY_NAME="macOS"
+        fi
+    elif [ -e /etc/os-release ]; then
+        PRETTY_NAME=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
+    else
+        PRETTY_NAME="Unknown OS"
+    fi
+
+    echo -e "Operating System : ${PRETTY_NAME}"
+    # Check for container environment
+    if [ "${OS_KERNEL}" == "Linux" ]; then
+        if [ -n "${SNAP}" ]; then
+            CONTAINER_ENV="Yes"
+            CONTAINER_RUNTIME="snapd"
+        else
+            for runtime in "${CONTAINER_RUNTIMES[@]}"; do
+                if grep -qa ":/${runtime}/" /proc/1/cgroup; then
+                    CONTAINER_ENV="Yes"
+                    CONTAINER_RUNTIME="${runtime}"
+                    break
+                else
+                    CONTAINER_ENV="No"
+                    CONTAINER_RUNTIME="Unknown"
+                fi
+            done
+        fi
+        echo -e "Containerized    : ${CONTAINER_ENV}"
+        if [ "${CONTAINER_ENV,,}" == "yes" ]; then
+            echo -e "Container Runtime: ${CONTAINER_RUNTIME}"
+        fi
+    fi
+    echo -e "Stream Sprout    : ${VERSION}"
+    echo -e "awk              : $(awk --version | head -n 1)"
+    echo -e "bash             : $(bash --version | head -n 1)"
+    echo -e "ffmpeg           : $(ffmpeg -version | head -n 1)"
 }
 
 function show_version() {
@@ -247,6 +298,9 @@ while [[ "$#" -gt 0 ]]; do
                 echo -e " \e[31m\U1F6AB\e[0m ${STREAM_SPROUT_CONFIG} was not found. Exiting."
                 exit 1
             fi;;
+        --info)
+            show_info
+            exit 0;;
         --version)
             show_version
             exit 0;;
