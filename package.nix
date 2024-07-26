@@ -34,6 +34,8 @@ stdenv.mkDerivation rec {
   installPhase = ''
     runHook preInstall
     install -Dm755 -t "$out/bin" stream-sprout
+    wrapProgram $out/bin/stream-sprout \
+      --prefix PATH : "${lib.makeBinPath runtimePaths}"
     runHook postInstall
   '';
 
