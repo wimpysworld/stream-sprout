@@ -16,9 +16,6 @@ platforms:
   arm64:
     build-on: [ arm64 ]
     build-for:  [arm64 ]
-  armhf:
-    build-on: [ armhf ]
-    build-for: [ armhf ]
 
 parts:
   stream-sprout:
