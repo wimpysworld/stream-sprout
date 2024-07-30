@@ -113,5 +113,11 @@ jobs:
             ghcr.io/${{ github.repository }}:${{ env.STREAM_SPROUT_VER }}-alpine
             ghcr.io/${{ github.repository }}:${{ github.sha }}-alpine
           platforms: linux/amd64, linux/arm64
+      - name: "Generate SBOM"
+        uses: anchore/sbom-action@v0
+        with:
+          image: ghcr.io/${{ github.repository }}:latest-alpine
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
       - name: Logout from Container Registry
         run: docker logout ghcr.io
