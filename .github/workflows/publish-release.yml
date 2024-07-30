@@ -119,9 +119,5 @@ jobs:
           image: ghcr.io/${{ github.repository }}:latest-alpine
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
-      - name: "Publish SBOM"
-        uses: anchore/sbom-action/publish-sbom@v0
-        with:
-          sbom-artifact-match: ".*\\.spdx$"
       - name: Logout from Container Registry
         run: docker logout ghcr.io
