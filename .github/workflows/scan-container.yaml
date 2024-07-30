@@ -9,7 +9,10 @@ jobs:
   vulnerability-scan:
     name: "Build and scan"
     runs-on: ubuntu-24.04
-    steps:    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
