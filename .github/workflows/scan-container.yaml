@@ -6,17 +6,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  - name: Set up Docker Buildx
-    uses: docker/setup-buildx-action@v2
+  vulnerability-scan:
+    name: "Build and scan"
+    runs-on: ubuntu-24.04
+    steps:    
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-  - name: build local container
-    uses: docker/build-push-action@v4
-    with:
-      tags: localbuild/testimage:latest
-      push: false
-      load: true
+      - name: build local container
+        uses: docker/build-push-action@v4
+        with:
+          tags: localbuild/testimage:latest
+          push: false
+          load: true
 
-  - name: Scan image
-    uses: anchore/scan-action@v3
-    with:
-      image: "localbuild/testimage:latest"
+      - name: Scan image
+        uses: anchore/scan-action@v3
+        with:
+          image: "localbuild/testimage:latest"
