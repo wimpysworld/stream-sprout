@@ -117,7 +117,7 @@ jobs:
           snap: ${{ steps.snapcraft.outputs.snap }}
           isClassic: false
       - name: Upload artifacts ⤴️
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: stream-sprout-snap
           path: ${{ steps.snapcraft.outputs.snap}}
