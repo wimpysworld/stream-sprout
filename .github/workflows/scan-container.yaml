@@ -29,3 +29,7 @@ jobs:
         uses: anchore/scan-action@v3
         with:
           image: "localbuild/testimage:latest"
+          output-format: table
+
+      - name: Inspect action report
+        run: cat ${{ steps.scan.outputs.table }}
