@@ -39,7 +39,7 @@ Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any ot
 ## Get Started
 
 - [Install](#installation) Stream Sprout 🧑‍💻
-- [Configure](#configuration) Stream Sprout 🧑‍💻
+- [Configure](#configure-stream-sprout) Stream Sprout 🧑‍💻
 - [Configure](#configure-obs-studio) OBS Studio 🎛️
 - Start `stream-sprout` ⌨️
 - Click the *Start Streaming* button in OBS Studio 🖱️
