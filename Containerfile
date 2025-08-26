@@ -2,7 +2,6 @@ FROM alpine:latest
 
 RUN apk add --no-cache --update \
     bash \
-    coreutils \
     jellyfin-ffmpeg \
     gawk \
     grep \
