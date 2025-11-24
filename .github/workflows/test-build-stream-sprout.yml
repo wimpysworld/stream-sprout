@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: "Checkout 🥡"
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - name: "Build & Test .deb 🍥"
       env:
         DEBFULLNAME: "Martin Wimpress"
@@ -55,7 +55,7 @@ jobs:
       contents: "read"
     steps:
       - name: "Checkout 🥡"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v6"
       - name: "Install Nix ❄️"
         uses: "DeterminateSystems/nix-installer-action@v19"
       - name: "Enable Magic Nix Cache 🪄"
@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: "Checkout 🥡"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Container Buildx
@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout 🥡
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Build snap 🐊
         uses: snapcore/action-build@v1
         id: snapcraft
