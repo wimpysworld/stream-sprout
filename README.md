@@ -271,10 +271,6 @@ services:
   [rtmp @ 0x2ca9be80] Unexpected stream STREAMBOMB, expecting c5b559b2-589d-4925-a28e-20d1954fd6c5
     Last message repeated 1 times
 ```
-- Stream Sprout does not support restreaming using secure RTMP (RTMPS).
-  - *At least I don't think it does, but I haven't fully tested it.*
-    - Kick only appears to support rtmps:// URLs and Stream Sprout restreams do not appear on Kick.
-  - https://superuser.com/questions/1438939/live-streaming-over-rtmps-using-ffmpeg
 - Each destination you add will increase your bandwidth requirements.
 
 ## References
