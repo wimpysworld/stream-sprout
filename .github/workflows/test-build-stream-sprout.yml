@@ -86,7 +86,7 @@ jobs:
           STREAM_SPROUT_VER=$(grep "^readonly VERSION" stream-sprout | cut -d'"' -f2)
           echo "STREAM_SPROUT_VER=$STREAM_SPROUT_VER" >> $GITHUB_ENV
       - name: "Build Container 🐋"
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Containerfile
