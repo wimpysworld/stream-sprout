@@ -185,7 +185,7 @@ function get_stream_tee() {
                 # and SERVICE_KEY points to a variable holding abcd1234, then URI
                 # would be set to rtmp://example.com/live/abcd1234.
                 URI="${!SERVICE_RTMP}/${!SERVICE_KEY}"
-                if [[ ! "${URI}" =~ ^rtmp://.* ]]; then
+                if [[ ! "${URI}" =~ ^rtmps?://.* ]]; then
                     echo -e " \e[31m\U1F6AB\e[0m ${SERVICE_NAME} is not a valid RTMP service URL"
                     continue
                 fi
