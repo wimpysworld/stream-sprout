@@ -7,7 +7,7 @@ on:
     paths:
       - .github/workflows/*.yml
       - stream-sprout
-      - debian/**
+      - nfpm.yaml
       - flake.nix
       - nix/package.nix
       - Containerfile
@@ -18,41 +18,64 @@ on:
     paths:
       - .github/workflows/*.yml
       - stream-sprout
-      - debian/**
+      - nfpm.yaml
       - flake.nix
       - nix/package.nix
       - Containerfile
       - snap/snapcraft.yaml
   workflow_dispatch:
 
+permissions: {}
+
 # TODO: arm64 runner
 # https://github.blog/changelog/2024-06-03-actions-arm-based-linux-and-windows-runners-are-now-in-public-beta/
 
 jobs:
-  test-deb-build:
+  test-nfpm-build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
-    - name: "Checkout 🥡"
-      uses: actions/checkout@v7
-    - name: "Build & Test .deb 🍥"
-      env:
-        DEBFULLNAME: "Martin Wimpress"
-        DEBEMAIL: "code@wimpress.io"
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        sudo apt-get -y update
-        sudo apt-get -y install debhelper devscripts
-        REL_VER=$(grep "^readonly VERSION" stream-sprout | cut -d'"' -f2)
-        rm debian/changelog
-        dch --package stream-sprout --newversion="${REL_VER}-1" --distribution=unstable "New upstream release." --create
-        dpkg-buildpackage --build=binary --no-check-builddeps --compression=gzip
-        sudo apt-get -y install "../stream-sprout_${REL_VER}-1_all.deb"
+      - name: "Checkout 🥡"
+        uses: actions/checkout@v7
+      - name: "Install nfpm 📦"
+        run: |
+          NFPM_VERSION="2.46.3"
+          NFPM_SHA256="9170d25ea056d7329def38134b2bcad98d02d221f8331610dcd619e84d28c565"
+          ARCHIVE="${RUNNER_TEMP}/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz"
+          curl --fail --silent --show-error --location --retry 5 \
+            --output "${ARCHIVE}" \
+            "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz"
+          echo "${NFPM_SHA256}  ${ARCHIVE}" | sha256sum --check
+          mkdir -p "${RUNNER_TEMP}/bin"
+          tar -xzf "${ARCHIVE}" -C "${RUNNER_TEMP}/bin" nfpm
+          "${RUNNER_TEMP}/bin/nfpm" --version
+          echo "${RUNNER_TEMP}/bin" >> "${GITHUB_PATH}"
+      - name: "Build & Test Linux packages 📦"
+        run: |
+          REL_VER=$(grep '^readonly VERSION=' stream-sprout | cut -d'"' -f2)
+          mkdir -p dist
+          VERSION="${REL_VER}" nfpm package --config nfpm.yaml \
+            --packager deb \
+            --target "dist/stream-sprout_${REL_VER}_all.deb"
+          VERSION="${REL_VER}" nfpm package --config nfpm.yaml \
+            --packager rpm \
+            --target "dist/stream-sprout-${REL_VER}-1.noarch.rpm"
+          VERSION="${REL_VER}" nfpm package --config nfpm.yaml \
+            --packager apk \
+            --target "dist/stream-sprout_${REL_VER}_noarch.apk"
+          VERSION="${REL_VER}" nfpm package --config nfpm.yaml \
+            --packager archlinux \
+            --target "dist/stream-sprout-${REL_VER}-1-any.pkg.tar.zst"
+          ls -la dist
+          sudo apt-get -y update
+          sudo apt-get -y install "./dist/stream-sprout_${REL_VER}_all.deb"
 
   test-nix-build:
     runs-on: ubuntu-24.04
     permissions:
-      id-token: "write"
-      contents: "read"
+      id-token: write
+      contents: read
     steps:
       - name: "Checkout 🥡"
         uses: "actions/checkout@v7"
@@ -67,6 +90,9 @@ jobs:
 
   test-container-build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
     steps:
       - name: "Checkout 🥡"
         uses: actions/checkout@v7
@@ -83,8 +109,10 @@ jobs:
       - name: Get stream-sprout version 🔢
         id: get_version
         run: |
-          STREAM_SPROUT_VER=$(grep "^readonly VERSION" stream-sprout | cut -d'"' -f2)
-          echo "STREAM_SPROUT_VER=$STREAM_SPROUT_VER" >> "$GITHUB_ENV"
+          STREAM_SPROUT_VER=$(
+            grep '^readonly VERSION=' stream-sprout | cut -d'"' -f2
+          )
+          echo "STREAM_SPROUT_VER=${STREAM_SPROUT_VER}" >> "${GITHUB_ENV}"
       - name: "Build Container 🐋"
         uses: docker/build-push-action@v7
         with:
@@ -101,6 +129,8 @@ jobs:
 
   test-snap-build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout 🥡
         uses: actions/checkout@v7
@@ -120,4 +150,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: stream-sprout-snap
-          path: ${{ steps.snapcraft.outputs.snap}}
+          path: ${{ steps.snapcraft.outputs.snap }}

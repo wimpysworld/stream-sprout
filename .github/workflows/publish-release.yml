@@ -11,82 +11,152 @@ on:
         type: "string"
         required: true
 
+permissions: {}
+
 jobs:
   version-check:
     name: "Check versions ⚖️"
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          ref: >-
+            ${{ inputs.tag != '' && format('refs/tags/{0}', inputs.tag) || '' }}
       - name: "Compare App and Git versions 🟰"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          APP_VERSION=$(grep "^readonly VERSION" stream-sprout | cut -d'"' -f2)
-          GIT_VERSION=$(git describe --tags | cut -d'-' -f1)
+          APP_VERSION=$(grep '^readonly VERSION=' stream-sprout | cut -d'"' -f2)
+          GIT_VERSION="${RELEASE_TAG#v}"
+          GIT_VERSION="${GIT_VERSION%%-*}"
           echo "App version: ${APP_VERSION}"
           echo "Git version: ${GIT_VERSION}"
-          if [ "${APP_VERSION}" != "${GIT_VERSION}" ]; then
-              echo "ERROR! Version mismatch.";
-              exit 1
+          if [[ "${APP_VERSION}" != "${GIT_VERSION}" ]]; then
+            echo "ERROR! Version mismatch."
+            exit 1
           fi
 
   build-release:
     needs: [version-check]
     name: "Build Release 👨‍🔧"
     runs-on: ubuntu-24.04
-    steps:
-    - uses: actions/checkout@v7
-    - name: "Build .deb 🍥"
-      env:
-        DEBFULLNAME: "Martin Wimpress"
-        DEBEMAIL: "code@wimpress.io"
-      run: |
-        sudo apt-get -y update
-        sudo apt-get -y install debhelper devscripts
-        REL_VER=$(grep "^readonly VERSION" stream-sprout | cut -d'"' -f2)
-        rm debian/changelog
-        dch --package stream-sprout --newversion="${REL_VER}-1" --distribution=unstable "New upstream release." --create
-        dpkg-buildpackage --build=binary --no-check-builddeps --compression=gzip
-    - name: "Publish release 📤️"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        REL_VER=$(grep "^readonly VERSION" stream-sprout | cut -d'"' -f2)
-        gh release create "${{ github.ref }}" --draft --generate-notes
-        gh release upload "${{ github.ref }}" "../stream-sprout_${REL_VER}-1_all.deb" --clobber
-        if [ "$(gh release view "${{ github.ref }}" --json assets --template '{{len .assets}}')" -lt 0 ]; then
-          exit 1
-        fi
-        gh release edit "${{ github.ref }}" --draft=false
-
-  publish-flakehub:
-    needs: [version-check]
-    name: "Publish FlakeHub ❄️"
-    runs-on: "ubuntu-24.04"
     permissions:
-      id-token: "write"
-      contents: "read"
+      contents: write
     steps:
-      - uses: "actions/checkout@v7"
+      - uses: actions/checkout@v7
         with:
-          ref: "${{ (inputs.tag != null) && format('refs/tags/{0}', inputs.tag) || '' }}"
-      - uses: "DeterminateSystems/nix-installer-action@main"
-      - uses: "DeterminateSystems/magic-nix-cache-action@main"
-      - uses: "DeterminateSystems/flakehub-push@main"
-        with:
-          visibility: "public"
-          name: "wimpysworld/stream-sprout"
-          tag: "${{ inputs.tag }}"
+          fetch-depth: 0
+          ref: >-
+            ${{ inputs.tag != '' && format('refs/tags/{0}', inputs.tag) || '' }}
+      - name: "Install nfpm 📦"
+        run: |
+          NFPM_VERSION="2.46.3"
+          NFPM_SHA256="9170d25ea056d7329def38134b2bcad98d02d221f8331610dcd619e84d28c565"
+          ARCHIVE="${RUNNER_TEMP}/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz"
+          curl --fail --silent --show-error --location --retry 5 \
+            --output "${ARCHIVE}" \
+            "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz"
+          echo "${NFPM_SHA256}  ${ARCHIVE}" | sha256sum --check
+          mkdir -p "${RUNNER_TEMP}/bin"
+          tar -xzf "${ARCHIVE}" -C "${RUNNER_TEMP}/bin" nfpm
+          "${RUNNER_TEMP}/bin/nfpm" --version
+          echo "${RUNNER_TEMP}/bin" >> "${GITHUB_PATH}"
+      - name: "Build Linux packages 📦"
+        run: |
+          REL_VER=$(grep '^readonly VERSION=' stream-sprout | cut -d'"' -f2)
+          mkdir -p dist
+          VERSION="${REL_VER}" nfpm package --config nfpm.yaml \
+            --packager deb \
+            --target "dist/stream-sprout_${REL_VER}_all.deb"
+          VERSION="${REL_VER}" nfpm package --config nfpm.yaml \
+            --packager rpm \
+            --target "dist/stream-sprout-${REL_VER}-1.noarch.rpm"
+          VERSION="${REL_VER}" nfpm package --config nfpm.yaml \
+            --packager apk \
+            --target "dist/stream-sprout_${REL_VER}_noarch.apk"
+          VERSION="${REL_VER}" nfpm package --config nfpm.yaml \
+            --packager archlinux \
+            --target "dist/stream-sprout-${REL_VER}-1-any.pkg.tar.zst"
+          (
+            cd dist
+            sha256sum \
+              "stream-sprout_${REL_VER}_all.deb" \
+              "stream-sprout-${REL_VER}-1.noarch.rpm" \
+              "stream-sprout_${REL_VER}_noarch.apk" \
+              "stream-sprout-${REL_VER}-1-any.pkg.tar.zst" \
+              > "stream-sprout_${REL_VER}_checksums.txt"
+          )
+      - name: "Publish release 📤️"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          REL_VER=$(grep '^readonly VERSION=' stream-sprout | cut -d'"' -f2)
+          PRERELEASE_ARGS=()
+          if [[ "${RELEASE_TAG}" == *-* ]]; then
+            PRERELEASE_ARGS+=(--prerelease)
+          fi
+          gh release create "${RELEASE_TAG}" \
+            --draft --generate-notes "${PRERELEASE_ARGS[@]}"
+          gh release upload "${RELEASE_TAG}" \
+            "dist/stream-sprout_${REL_VER}_all.deb" \
+            "dist/stream-sprout-${REL_VER}-1.noarch.rpm" \
+            "dist/stream-sprout_${REL_VER}_noarch.apk" \
+            "dist/stream-sprout-${REL_VER}-1-any.pkg.tar.zst" \
+            "dist/stream-sprout_${REL_VER}_checksums.txt" \
+            --clobber
+          ASSET_COUNT=$(gh release view "${RELEASE_TAG}" \
+            --json assets --template '{{len .assets}}')
+          if [[ "${ASSET_COUNT}" -lt 5 ]]; then
+            echo "ERROR! Expected 5 release assets, found ${ASSET_COUNT}."
+            exit 1
+          fi
+          NOTES_FILE="${RUNNER_TEMP}/release-notes.md"
+          gh release view "${RELEASE_TAG}" \
+            --json body --jq .body > "${NOTES_FILE}"
+          {
+            printf '\n## Install\n\n'
+            for entry in \
+              "Debian and Ubuntu|apt" \
+              "Fedora and openSUSE|rpm" \
+              "Arch Linux|pkg" \
+              "Alpine Linux|apk" \
+              "Nix and NixOS|nix"
+            do
+              label="${entry%|*}"
+              host="${entry#*|}.wimpys.world"
+              printf -- '- %s: [%s](https://%s/#stream-sprout)\n' \
+                "${label}" "${host}" "${host}"
+            done
+            printf -- '- Container: \140%s\140\n' \
+              "docker pull ghcr.io/wimpysworld/stream-sprout:latest-alpine"
+          } >> "${NOTES_FILE}"
+          gh release edit "${RELEASE_TAG}" \
+            --draft=false --notes-file "${NOTES_FILE}"
+      - name: Move latest tag
+        if: ${{ !contains(inputs.tag || github.ref_name, '-') }}
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          git tag --force latest "${RELEASE_TAG}^{commit}"
+          git push --force origin refs/tags/latest
 
   publish-container:
     needs: [version-check]
     name: "Publish Container 🐋"
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: "Checkout 🥡"
         uses: actions/checkout@v7
+        with:
+          ref: >-
+            ${{ inputs.tag != '' && format('refs/tags/{0}', inputs.tag) || '' }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
       - name: Set up Container Buildx
@@ -100,8 +170,10 @@ jobs:
       - name: Get stream-sprout version 🔢
         id: get_version
         run: |
-          STREAM_SPROUT_VER=$(grep "^readonly VERSION" stream-sprout | cut -d'"' -f2)
-          echo "STREAM_SPROUT_VER=$STREAM_SPROUT_VER" >> "$GITHUB_ENV"
+          STREAM_SPROUT_VER=$(
+            grep '^readonly VERSION=' stream-sprout | cut -d'"' -f2
+          )
+          echo "STREAM_SPROUT_VER=${STREAM_SPROUT_VER}" >> "${GITHUB_ENV}"
       - name: "Build Container 🐋"
         uses: docker/build-push-action@v7
         with:

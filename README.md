@@ -38,7 +38,7 @@ Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any ot
 
 ## Get Started
 
-- [Install](#installation) Stream Sprout 🧑‍💻
+- [Install](#install) Stream Sprout 🧑‍💻
 - [Configure](#configure-stream-sprout) Stream Sprout 🧑‍💻
 - [Configure](#configure-obs-studio) OBS Studio 🎛️
 - Start `stream-sprout` ⌨️
@@ -47,93 +47,41 @@ Stream Sprout is developed on Linux 🐧 and should work on macOS 🍏 or any ot
 - Click the *Stop Streaming* button in OBS Studio 🖱️
 - <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop `stream-sprout` ⌨️
 
-## Installation
+## Install
 
-### Debian
+| | Platform | Repository |
+| :-: | --- | --- |
+| <img src="https://apt.wimpys.world/logo.svg" width="32" height="32" alt=""> | Debian and Ubuntu | [apt.wimpys.world](https://apt.wimpys.world/#stream-sprout) |
+| <img src="https://rpm.wimpys.world/logo.svg" width="32" height="32" alt=""> | Fedora and openSUSE | [rpm.wimpys.world](https://rpm.wimpys.world/#stream-sprout) |
+| <img src="https://pkg.wimpys.world/logo.svg" width="32" height="32" alt=""> | Arch Linux | [pkg.wimpys.world](https://pkg.wimpys.world/#stream-sprout) |
+| <img src="https://apk.wimpys.world/logo.svg" width="32" height="32" alt=""> | Alpine Linux | [apk.wimpys.world](https://apk.wimpys.world/#stream-sprout) |
+| <img src="https://nix.wimpys.world/logo.svg" width="32" height="32" alt=""> | Nix and NixOS | [nix.wimpys.world](https://nix.wimpys.world/#stream-sprout) |
 
-- Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
-- Install it with `apt-get install ./stream-sprout_0.1.5-1_all.deb`.
+Each repository is signed, and its page gives the setup steps and keeps Stream Sprout up to date.
 
-### macOS
+### Container
 
-Install the Stream Sprout requirements using `brew`:
+Images are published to the GitHub Container Registry for `linux/amd64` and `linux/arm64`.
 
-```shell
-brew install bash ffmpeg
-```
-
-Now clone the project:
-
-```shell
-git clone https://github.com/wimpysworld/stream-sprout.git
-cd stream-sprout
-```
-
-### Nix & NixOS
-
-[![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/wimpysworld/stream-sprout/badge)](https://flakehub.com/flake/wimpysworld/stream-sprout)
-
-Stable releases of Stream Sprout are published to FlakeHub for Nix users ❄️
-See the flake on FlakeHub for more details:
-
-- <https://flakehub.com/flake/wimpysworld/stream-sprout>
-
-### Snap
-
-[![stream-sprout](https://snapcraft.io/stream-sprout/badge.svg)](https://snapcraft.io/stream-sprout)
-
-For Linux distributions that support snap packages, Stream Sprout is available from the Snap Store 🛍️
-
-```shell
-sudo snap install stream-sprout
-```
-
-### Ubuntu
-
-- Download the Stream Sprout .deb package from the [releases page](https://github.com/wimpysworld/stream-sprout/releases) 📦️
-- Install it with `apt-get install ./stream-sprout_0.1.5-1_all.deb`.
-
-### Docker & Podman
-
-#### Pull the container
-
-The Stream Sprout container image is available from the GitHub Container Registry for amd64 and arm64.
-To pull the latest container image:
+Pull the latest image:
 
 ```shell
 docker pull ghcr.io/wimpysworld/stream-sprout:latest-alpine
 ```
 
-Or if you want a specific version:
+Mount the directory that holds `stream-sprout.yaml` and expose the RTMP port:
 
 ```shell
-docker pull ghcr.io/wimpysworld/stream-sprout:0.1.5-alpine
+docker run -p 1935:1935 -it -v "$PWD:/data" \
+  ghcr.io/wimpysworld/stream-sprout:latest-alpine \
+  --config /data/stream-sprout.yaml
 ```
 
-#### Run the container
+- `-p 1935:1935` exposes the RTMP server port `1935` on the host. Change it when `stream-sprout.yaml` sets a different port.
+- `-it` runs the container interactively.
+- `-v "$PWD:/data"` mounts the current directory as `/data` inside the container.
 
-The `stream-sprout.yaml` configuration file will be on the host computer so you need mount a volume to access it from the container.
-
-If you have already pulled the container image, you can run Stream Sprout with:
-
-```shell
-docker run -p 1935:1935 -it -v $PWD:/data stream-sprout --config /data/stream-sprout.yaml
-```
-
-If you have not pulled or built the container image, you can run Stream Sprout with:
-
-```shell
-docker run -p 1935:1935 -it -v $PWD:/data ghcr.io/wimpysworld/stream-sprout:alpine-latest --config /data/stream-sprout.yaml
-```
-
-- The `-p 1935:1935` part will expose the RTMP server port `1935` on the host computer.
-  - If you have configured Stream Sprout to use a different port, you should change the port number here too.
-- The `-it` options will run the container in interactive mode.
-- The `-v $PWD:/data` part will mount your current directory `$PWD` as `/data` within the container, allowing you to access your files using the `/data` path.
-
-#### Build the container
-
-Build the Stream Sprout container image:
+Build the container image locally:
 
 ```shell
 docker build -f Containerfile -t stream-sprout .
@@ -141,9 +89,9 @@ docker build -f Containerfile -t stream-sprout .
 
 ### From source
 
-You need to have [FFmpeg](https://ffmpeg.org/) on your system.
+Stream Sprout requires Bash 5.0 or later and [FFmpeg](https://ffmpeg.org/) on `PATH`.
 
-```bash
+```shell
 git clone https://github.com/wimpysworld/stream-sprout.git
 cd stream-sprout
 ```

@@ -9,7 +9,7 @@ Stream Sprout is a bash-based RTMP restreaming tool that forwards a single video
 - **Language:** Bash 5.0+ (single script: `stream-sprout`)
 - **Runtime dependency:** FFmpeg (RTMP server and restreaming)
 - **Configuration:** YAML parsed via awk/sed
-- **Packaging:** Nix flake, Debian .deb, Snap, Docker/Podman
+- **Packaging:** nFPM (`.deb`, `.rpm`, `.apk`, `.pkg.tar.zst` via `nfpm.yaml`), Nix flake (`nix/package.nix`), Snap (`snap/`), Docker/Podman (`Containerfile`)
 
 ## Build and Run Commands
 
@@ -22,6 +22,10 @@ Stream Sprout is a bash-based RTMP restreaming tool that forwards a single video
 
 # Show system info (useful for bug reports)
 ./stream-sprout --info
+
+# Build Linux packages with nFPM (deb, rpm, apk, archlinux)
+VERSION=$(grep '^readonly VERSION=' stream-sprout | cut -d'"' -f2)
+VERSION="${VERSION}" nix run nixpkgs#nfpm -- package --config nfpm.yaml --packager deb --target dist/
 
 # Nix build
 nix build
@@ -36,10 +40,11 @@ docker run -p 1935:1935 -it -v $PWD:/data stream-sprout --config /data/stream-sp
 
 ## Linting
 
-ShellCheck is enforced via CI on all pull requests.
+ShellCheck, shfmt, and actionlint are enforced via `just lint` and CI.
 
 ```bash
 # Run locally before committing
+just lint
 shellcheck stream-sprout
 ```
 
@@ -57,13 +62,14 @@ The script includes `# shellcheck disable=SC2154` for variables set dynamically 
 ## Project Structure
 
 ```
-stream-sprout           # Main bash script (single file)
-stream-sprout.yaml      # Local config (gitignored)
+stream-sprout               # Main bash script (single file)
+stream-sprout.yaml          # Local config (gitignored)
 stream-sprout.yaml.example  # Example configuration
-package.nix             # Nix package definition
-devshell.nix            # Nix development shell
-flake.nix               # Nix flake
-Containerfile           # Alpine-based container
+nfpm.yaml                   # Linux package definitions (.deb, .rpm, .apk, .pkg.tar.zst)
+nix/package.nix             # Nix package definition
+flake.nix                   # Nix flake and development shell
+Containerfile               # Alpine-based container
+snap/snapcraft.yaml         # Snap package definition
 ```
 
 ## Configuration
@@ -88,8 +94,8 @@ Common prefixes: `feat:`, `fix:`, `chore:`, `refactor:`, `docs:`
 
 When changing version:
 
-1. Update `VERSION` in `stream-sprout` script
-2. The Nix package extracts version automatically from the script
+1. Update `VERSION` in `stream-sprout`
+2. The Nix package and nFPM release workflow read the version from `stream-sprout` automatically
 
 ## Constraints
 

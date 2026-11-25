@@ -1,0 +1,85 @@
+---
+name: stream-sprout
+arch: all
+platform: linux
+version: "${VERSION}"
+section: video
+priority: optional
+maintainer: "Martin Wimpress <code@wimpress.io>"
+vendor: "Martin Wimpress"
+homepage: "https://stream-sprout.wimpys.world/"
+license: "Apache-2.0"
+description: >-
+  Restream a video source to multiple destinations such as Twitch, YouTube,
+  Owncast, and PeerTube.
+
+contents:
+  - src: ./stream-sprout
+    dst: /usr/bin/stream-sprout
+    file_info:
+      mode: 0755
+  # nFPM only recognises type: doc for RPM and drops it in other formats.
+  - src: ./stream-sprout.yaml.example
+    dst: /usr/share/doc/stream-sprout/stream-sprout.yaml.example
+    type: doc
+    packager: rpm
+    file_info:
+      mode: 0644
+  - src: ./stream-sprout.yaml.example
+    dst: /usr/share/doc/stream-sprout/stream-sprout.yaml.example
+    packager: deb
+    file_info:
+      mode: 0644
+  - src: ./stream-sprout.yaml.example
+    dst: /usr/share/doc/stream-sprout/stream-sprout.yaml.example
+    packager: apk
+    file_info:
+      mode: 0644
+  - src: ./stream-sprout.yaml.example
+    dst: /usr/share/doc/stream-sprout/stream-sprout.yaml.example
+    packager: archlinux
+    file_info:
+      mode: 0644
+
+overrides:
+  deb:
+    deb:
+      arch: all
+    depends:
+      - bash
+      - coreutils
+      - ffmpeg
+      - mawk | gawk
+      - grep
+      - sed
+  rpm:
+    rpm:
+      arch: noarch
+    depends:
+      - bash
+      - coreutils
+      - ffmpeg
+      - gawk
+      - grep
+      - sed
+  apk:
+    apk:
+      arch: noarch
+    depends:
+      - bash
+      - coreutils
+      - ffmpeg
+      - gawk
+      - grep
+      - sed
+  archlinux:
+    archlinux:
+      arch: any
+      packager: "Martin Wimpress <code@wimpress.io>"
+    depends:
+      - bash
+      - coreutils
+      - ffmpeg
+      - gawk
+      - grep
+      - sed
