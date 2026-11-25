@@ -68,6 +68,7 @@
                 gnused
                 just
               ]
+              ++ [ (pkgs.callPackage ./nix/ntrecord.nix { }) ]
               ++ (if tailorPkgs ? tailor then [ tailorPkgs.tailor ] else [ ])
               ++ import ./nix/loader.nix { inherit pkgs; };
           };

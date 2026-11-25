@@ -16,7 +16,7 @@ Connect [OBS Studio](https://obsproject.com/) to Stream Sprout as a custom RTMP 
 5. Enter your `server.key` value from `stream-sprout.yaml` in `Stream Key` (leave it blank if `key` is unset).
 6. Click `Apply` and `OK`.
 
-![OBS Studio Stream Settings](https://raw.githubusercontent.com/wimpysworld/stream-sprout/main/.github/obs-settings.png)
+![OBS Studio Stream Settings](https://raw.githubusercontent.com/wimpysworld/stream-sprout/main/pages/obs-settings.png)
 
 ## Start and stop a broadcast
 

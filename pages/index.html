@@ -62,7 +62,7 @@
           <figcaption><span class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span> Live on four platforms</figcaption>
           <picture>
             <source srcset="demo-still.png" media="(prefers-reduced-motion: reduce)">
-            <img class="terminal-demo" src="demo.webp" alt="Terminal session running Stream Sprout, streaming to Owncast, PeerTube, Twitch, and YouTube while recording a local MKV archive." width="930" height="749" decoding="async">
+            <img class="terminal-demo" src="demo.webp" alt="Terminal session running Stream Sprout, streaming to Owncast, PeerTube, Twitch, and YouTube while recording a local MKV archive." width="846" height="578" decoding="async">
           </picture>
         </figure>
       </section>
@@ -122,6 +122,10 @@
             <p>Run <code translate="no">stream-sprout</code> in a terminal, then click Start Streaming in OBS Studio to go live everywhere.</p>
           </li>
         </ol>
+        <figure class="obs-figure">
+          <img src="obs-settings.png" alt="OBS Studio Stream settings with Service set to Custom, Server set to rtmp://127.0.0.1:1935/sprout, Stream Key entered, and Use authentication unchecked." width="857" height="357" loading="lazy" decoding="async">
+          <figcaption>OBS Studio: Settings &gt; Stream configured for a local Stream Sprout server.</figcaption>
+        </figure>
         <p class="workflow-note bandwidth-note"><strong>Check your upload speed:</strong> each active platform receives its own copy of your stream, so make sure your internet upload bandwidth covers the total bitrate across every enabled destination.</p>
       </section>
 

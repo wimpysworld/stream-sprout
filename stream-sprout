@@ -7,6 +7,12 @@ stty -echoctl
 readonly STREAM_SPROUT_YAML="stream-sprout.yaml"
 readonly VERSION="0.1.6"
 
+STATUS_INTERVAL="${STREAM_SPROUT_STATUS_INTERVAL:-30}"
+if [[ ! "${STATUS_INTERVAL}" =~ ^[1-9][0-9]*$ ]]; then
+	STATUS_INTERVAL=30
+fi
+readonly STATUS_INTERVAL
+
 function cleanup() {
 	echo -e " \e[31m\U26D4\e[0m Control-C"
 	sleep 0.25
@@ -388,7 +394,7 @@ while true; do
 			fi
 
 			# Check if status changed or if it's time to log the status again
-			if [ ${NEW_STATUS} -ne ${STREAMING_STATUS} ] || ((COUNTER % 30 == 0)); then
+			if [ ${NEW_STATUS} -ne ${STREAMING_STATUS} ] || ((COUNTER % STATUS_INTERVAL == 0)); then
 				# If the status has changed, then show the details
 				if [ ${NEW_STATUS} -ne ${STREAMING_STATUS} ]; then
 					stream_details

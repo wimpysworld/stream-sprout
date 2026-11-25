@@ -376,11 +376,11 @@ h3 {
   color: var(--mu-color);
   box-shadow: var(--mu-card-box-shadow);
 }
-:root[data-theme="dark"] .terminal {
+:root[data-theme="dark"] :is(.terminal, .obs-figure) {
   box-shadow: var(--mu-card-box-shadow), 0 14px 28px -8px rgba(0, 0, 0, 0.45);
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .terminal {
+  :root:not([data-theme="light"]) :is(.terminal, .obs-figure) {
     box-shadow: var(--mu-card-box-shadow), 0 14px 28px -8px rgba(0, 0, 0, 0.45);
   }
 }
@@ -559,6 +559,30 @@ h3 {
 }
 .workflow-note {
   margin-bottom: 0;
+}
+.obs-figure {
+  overflow: hidden;
+  max-width: 857px;
+  margin: 1.5rem auto;
+  border: 1px solid var(--mu-muted-border-color);
+  border-radius: 0.75rem;
+  background: #1d1e2b;
+  color: var(--mu-color);
+  box-shadow: var(--mu-card-box-shadow);
+}
+.obs-figure img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+.obs-figure figcaption {
+  border-top: 1px solid var(--mu-muted-border-color);
+  padding: 0.75rem 1.25rem;
+  background: var(--sprout-tint-green);
+  color: var(--mu-color);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 .bandwidth-note {
   padding: 0.9rem 1.15rem;
