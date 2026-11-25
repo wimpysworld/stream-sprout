@@ -15,7 +15,7 @@ mcp:
 
 repository:
   description: "Restream a video source to multiple destinations such as Twitch, YouTube, Owncast and Peertube 📡"
-  homepage: ""
+  homepage: https://stream-sprout.wimpys.world/
   has_wiki: true
   has_discussions: false
   has_projects: false
@@ -134,6 +134,7 @@ pages:
   enabled: true
   generator: static
   path: pages
+  cname: stream-sprout.wimpys.world
   links:
     website: https://wimpys.world/
     forum: ""
@@ -143,7 +144,7 @@ pages:
     linkedin: https://linkedin.com/in/martinwimpress
     slack: ""
     discord: https://discord.com/invite/vUsydfP
-    matrix: "https://matrix.to/#/@wimpress:matrix.org"
+    matrix: ""
     youtube: https://youtube.com/WimpysWorld
     twitch: https://twitch.tv/WimpysWorld
     peertube: ""
@@ -151,8 +152,8 @@ pages:
     podcast: https://linuxmatters.sh
     instagram: ""
     pixelfed: ""
-    steam: https://steamcommunity.com/id/wimpress/
-    itchio: https://wimpress.itch.io/
+    steam: ""
+    itchio: ""
     patreon: ""
     github_sponsors: https://github.com/sponsors/flexiondotorg
     kofi: ""

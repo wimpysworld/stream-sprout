@@ -25,13 +25,61 @@
   --mu-border-radius: 0.375rem;
 }
 
+/* Stream Sprout palette: sprout green and pale yellow.
+ * Match µCSS mode selector specificity so system, light, and dark modes align. */
+:root:not([data-theme="dark"]),
+:root[data-theme="light"] {
+  color-scheme: light;
+  --mu-primary: #2d6a1e;
+  --mu-primary-hover: #215015;
+  --mu-primary-inverse: #ffffff;
+  --mu-primary-focus: rgba(45, 106, 30, 0.25);
+  --mu-primary-underline: #2d6a1e;
+  --mu-primary-hover-underline: #215015;
+  --mu-warning: #8f6b00;
+  --sprout-tint-green: #eef7e8;
+  --sprout-tint-yellow: #fbf8dc;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --mu-primary: #8ad45b;
+  --mu-primary-hover: #a6e27e;
+  --mu-primary-inverse: #10200b;
+  --mu-primary-focus: rgba(138, 212, 91, 0.25);
+  --mu-primary-underline: #8ad45b;
+  --mu-primary-hover-underline: #a6e27e;
+  --mu-warning: #efe284;
+  --sprout-tint-green: rgba(138, 212, 91, 0.1);
+  --sprout-tint-yellow: rgba(239, 226, 132, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --mu-primary: #8ad45b;
+    --mu-primary-hover: #a6e27e;
+    --mu-primary-inverse: #10200b;
+    --mu-primary-focus: rgba(138, 212, 91, 0.25);
+    --mu-primary-underline: #8ad45b;
+    --mu-primary-hover-underline: #a6e27e;
+    --mu-warning: #efe284;
+    --sprout-tint-green: rgba(138, 212, 91, 0.1);
+    --sprout-tint-yellow: rgba(239, 226, 132, 0.1);
+  }
+}
+
 body {
   margin: 0;
 }
 .container {
   width: min(100% - 3rem, 1160px);
   max-width: none;
+  margin-inline: auto;
   padding-inline: 0;
+}
+section[id] {
+  scroll-margin-top: 1.5rem;
 }
 [hidden] {
   display: none !important;
@@ -48,7 +96,11 @@ body {
   border: 0;
 }
 a {
+  color: var(--mu-primary);
   text-underline-offset: 0.2em;
+}
+a:hover {
+  color: var(--mu-primary-hover);
 }
 a:focus-visible,
 button:focus-visible,
@@ -121,9 +173,9 @@ body > main:focus-visible h1:first-of-type::before {
   overflow-wrap: anywhere;
 }
 .brand-mark {
-  flex: 0 0 33px;
-  width: 33px;
-  height: 33px;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
 }
 .site-header nav {
   margin-left: auto;
@@ -157,7 +209,7 @@ nav a {
   box-shadow: none;
 }
 .icon-button:hover {
-  background: var(--mu-secondary-background);
+  background: var(--sprout-tint-green);
   color: var(--mu-primary);
 }
 /* Octicons 19.36.0, loaded from the CDN as colourable masks. */
@@ -183,8 +235,14 @@ nav a {
 .arrow-down {
   --icon: url("https://cdn.jsdelivr.net/npm/@primer/octicons@19.36.0/build/svg/arrow-down-16.svg");
 }
+.arrow-up-right {
+  --icon: url("https://cdn.jsdelivr.net/npm/@primer/octicons@19.36.0/build/svg/arrow-up-right-16.svg");
+}
 .link-external {
   --icon: url("https://cdn.jsdelivr.net/npm/@primer/octicons@19.36.0/build/svg/link-external-16.svg");
+}
+.package-icon {
+  --icon: url("https://cdn.jsdelivr.net/npm/@primer/octicons@19.36.0/build/svg/package-24.svg");
 }
 .theme-picker {
   position: relative;
@@ -332,7 +390,8 @@ h3 {
   gap: 0.85rem;
   border-bottom: 1px solid var(--mu-muted-border-color);
   padding: 0.75rem 1.25rem;
-  color: var(--mu-muted-color);
+  background: var(--sprout-tint-green);
+  color: var(--mu-color);
   font-size: 0.78rem;
   font-weight: 500;
 }
@@ -353,7 +412,7 @@ h3 {
   background: var(--mu-warning);
 }
 .terminal-dots i:nth-child(3) {
-  background: var(--mu-success);
+  background: var(--mu-primary);
 }
 .terminal pre {
   background: transparent;
@@ -363,6 +422,8 @@ h3 {
   border-radius: 0;
   font-size: 0.85rem;
   line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 .terminal code {
   color: var(--mu-color);
@@ -376,12 +437,15 @@ h3 {
   color: var(--mu-muted-color);
   user-select: none;
 }
-.terminal-command {
+.terminal-command,
+.terminal-brand,
+.terminal-status {
   color: var(--mu-primary);
   font-weight: 600;
 }
-.terminal-argument {
-  color: var(--mu-color);
+.terminal-accent {
+  color: var(--mu-warning);
+  font-weight: 600;
 }
 .section-rule {
   border-top: 1px solid var(--mu-muted-border-color);
@@ -414,13 +478,10 @@ h3 {
   font-weight: 650;
   color: var(--mu-h2-color);
 }
-.feature-list > div:nth-child(1) {
+.feature-list > div:nth-child(odd) {
   --feature-accent: var(--mu-primary);
 }
-.feature-list > div:nth-child(2) {
-  --feature-accent: var(--mu-info);
-}
-.feature-list > div:nth-child(3) {
+.feature-list > div:nth-child(even) {
   --feature-accent: var(--mu-warning);
 }
 .feature-number {
@@ -478,17 +539,11 @@ h3 {
   list-style: none;
   counter-increment: steps;
 }
-.steps li:nth-child(1) {
+.steps li:nth-child(odd) {
   --step-accent: var(--mu-primary);
 }
-.steps li:nth-child(2) {
-  --step-accent: var(--mu-info);
-}
-.steps li:nth-child(3) {
+.steps li:nth-child(even) {
   --step-accent: var(--mu-warning);
-}
-.steps li:nth-child(4) {
-  --step-accent: var(--mu-success);
 }
 .steps li::before {
   content: "0" counter(steps);
@@ -507,8 +562,8 @@ h3 {
   display: inline-block;
   padding: 0.15rem 0.45rem;
   border-radius: 0.25rem;
-  background: var(--mu-code-background-color);
-  color: var(--mu-code-color);
+  background: var(--sprout-tint-green);
+  color: var(--mu-color);
   font-family: var(--mu-font-family-monospace);
   font-size: 0.8rem;
   overflow-wrap: anywhere;
@@ -528,73 +583,204 @@ h3 {
 .workflow-note {
   margin-bottom: 0;
 }
-.install {
+.bandwidth-note {
+  padding: 0.9rem 1.15rem;
+  border: 1px solid var(--mu-muted-border-color);
+  border-left: 4px solid var(--mu-warning);
+  border-radius: 0.5rem;
+  background: var(--sprout-tint-yellow);
+  color: var(--mu-color);
+}
+.install-grid {
   display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: clamp(2rem, 4vw, 4rem);
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0;
+  margin: 2rem 0 1.5rem;
+  list-style: none;
 }
-#install > div:first-child {
-  align-self: start;
+/* Mid widths: two tiles to a row, with Nix beside the container tile. */
+@media (min-width: 744px) {
+  .install-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
-.install p {
-  max-width: 30rem;
+/* Wide: four Linux distro tiles on row one, then Nix and the container tile. */
+@media (min-width: 1200px) {
+  .install-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .install-grid > .install-container {
+    grid-column: span 3;
+  }
+  a.install-tile {
+    gap: 0.7rem;
+    padding-inline: 0.95rem;
+  }
+  .install-grid .install-name {
+    font-size: 0.95rem;
+  }
 }
-.muted {
-  color: var(--mu-muted-color);
-  font-size: 0.875rem;
-}
-.install-options {
-  align-self: start;
+.install-grid > li {
+  display: flex;
+  min-width: 0;
   margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Each tile takes its hover tint from the brand colour of its repository logo. */
+.install-tile {
+  --tile-brand: var(--mu-primary);
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+  min-height: 5.75rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--mu-muted-border-color);
   border-radius: 0.75rem;
   background: var(--mu-card-background-color);
   box-shadow: var(--mu-card-box-shadow);
-  overflow: visible;
+  color: var(--mu-color);
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
-.install-options details {
-  margin-block: 0;
+a.install-tile:is(:hover, :focus-visible) {
+  border-color: color-mix(in srgb, var(--tile-brand) 55%, var(--mu-muted-border-color));
+  background: color-mix(in srgb, var(--tile-brand) 8%, var(--mu-card-background-color));
+  color: var(--mu-color);
+  text-decoration: none;
 }
-.install-options details[open] {
-  padding-bottom: 1.1rem;
+a.install-tile:focus-visible {
+  outline-offset: 2px;
 }
-.install-options summary {
+/* Keep muted metadata legible against the tinted hover/focus background. */
+a.install-tile:is(:hover, :focus-visible) :is(.install-platform, .install-host) {
+  color: var(--mu-h2-color);
+}
+.install-tile[data-repo="apt"] {
+  --tile-brand: #e95420;
+}
+.install-tile[data-repo="rpm"] {
+  --tile-brand: #ee0000;
+}
+.install-tile[data-repo="pkg"] {
+  --tile-brand: #1793d1;
+}
+.install-tile[data-repo="apk"] {
+  --tile-brand: light-dark(#0d597f, #7fc0e3);
+}
+.install-tile[data-repo="nix"] {
+  --tile-brand: light-dark(#5277c3, #7ebae4);
+}
+.install-logo,
+.install-glyph {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+}
+.install-glyph {
+  color: var(--mu-primary);
+}
+.install-text {
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.9rem 1.15rem;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+.install-platform {
+  color: var(--mu-muted-color);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.install-name {
+  color: var(--mu-h2-color);
+  font-size: 1.02rem;
   font-weight: 650;
-}
-.install-options summary::after {
-  margin-left: auto;
-}
-.install-options details > :not(summary) {
-  margin-inline: 1.15rem;
-}
-.install-options pre {
-  border: 1px solid var(--mu-muted-border-color);
-  padding: 0.85rem 1rem;
-  margin-bottom: 0.75rem;
-  font-size: 0.84rem;
-  white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.install-options pre:last-child {
-  margin-bottom: 0;
-}
-.install-options pre code {
-  padding: 0;
-}
-.install-options p {
+.install-host {
+  margin-top: 0.1rem;
   color: var(--mu-muted-color);
-  font-size: 0.92rem;
-  margin-bottom: 0.55rem;
+  font-family: var(--mu-font-family-monospace);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
 }
-.install-options p:first-of-type {
-  margin-top: 0.75rem;
+.install-tile > .arrow-up-right {
+  flex: 0 0 auto;
+  color: var(--mu-muted-color);
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
 }
-.install-options p:last-child {
-  margin-bottom: 0;
+a.install-tile:is(:hover, :focus-visible) > .arrow-up-right {
+  color: var(--tile-brand);
+  transform: translate(2px, -2px);
+}
+.install-command-tile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "glyph text"
+    "command command";
+  align-items: center;
+  row-gap: 0.75rem;
+  column-gap: 0.9rem;
+}
+.install-command-tile > .install-glyph {
+  grid-area: glyph;
+}
+.install-command-tile > .install-text {
+  grid-area: text;
+}
+.install-command-tile a.install-name {
+  align-self: flex-start;
+  text-decoration: underline;
+  text-decoration-color: var(--mu-muted-border-color);
+}
+.install-command-tile a.install-name:hover {
+  color: var(--mu-primary);
+  text-decoration-color: currentColor;
+}
+.install-command {
+  grid-area: command;
+  display: block;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--mu-muted-border-color);
+  border-radius: var(--mu-border-radius);
+  background: var(--mu-code-background-color);
+  color: var(--mu-code-color);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 1200px) {
+  .install-command-tile {
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas: "glyph text command";
+    column-gap: 0.9rem;
+  }
+  .install-command {
+    margin-left: 0.5rem;
+    padding-inline: 0.85rem;
+    font-size: 0.82rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .install-tile,
+  .install-tile > .arrow-up-right {
+    transition: none;
+  }
+  a.install-tile:is(:hover, :focus-visible) > .arrow-up-right {
+    transform: none;
+  }
 }
 .install-links {
   display: flex;
@@ -603,143 +789,8 @@ h3 {
   margin-top: 1.25rem;
 }
 .site-hero > *,
-.install > *,
 .steps > li {
   min-width: 0;
-}
-.install-options details > summary:focus-visible {
-  outline: 3px solid var(--mu-primary);
-  outline-offset: -3px;
-}
-/* Simple Icons 16.30.0, with the current theme's text colour. */
-.distro-icon {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin-right: 0.25rem;
-  vertical-align: -0.2em;
-  background-color: currentColor;
-  -webkit-mask: var(--icon) center / contain no-repeat;
-  mask: var(--icon) center / contain no-repeat;
-}
-.debian-icon {
-  --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@16.30.0/icons/debian.svg");
-}
-.ubuntu-icon {
-  --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@16.30.0/icons/ubuntu.svg");
-}
-.fedora-icon {
-  --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@16.30.0/icons/fedora.svg");
-}
-.opensuse-icon {
-  --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@16.30.0/icons/opensuse.svg");
-}
-.alpine-icon {
-  --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@16.30.0/icons/alpinelinux.svg");
-}
-.arch-icon {
-  --icon: url("https://cdn.jsdelivr.net/npm/simple-icons@16.30.0/icons/archlinux.svg");
-}
-.carousel {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  border-radius: var(--mu-border-radius);
-}
-.carousel-slide {
-  flex: 0 0 100%;
-  display: grid;
-  place-items: center;
-  aspect-ratio: 16 / 9;
-  scroll-snap-align: start;
-  background: var(--slide-background);
-  color: var(--slide-color);
-  font-size: clamp(4rem, 15vw, 10rem);
-  font-weight: 750;
-}
-.carousel-slide:nth-child(1) {
-  --slide-background: var(--mu-contrast);
-  --slide-color: var(--mu-contrast-inverse);
-}
-.carousel-slide:nth-child(2) {
-  --slide-background: var(--mu-info);
-  --slide-color: var(--mu-info-inverse);
-}
-.carousel-slide:nth-child(3) {
-  --slide-background: var(--mu-warning);
-  --slide-color: var(--mu-warning-inverse);
-}
-.carousel-slide:focus-visible {
-  outline: 3px solid var(--slide-color);
-  outline-offset: -6px;
-}
-.carousel-controls {
-  justify-content: center;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-.carousel-controls a {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  padding: 0;
-  border: 1px solid var(--mu-muted-border-color);
-  border-radius: var(--mu-border-radius);
-}
-.screenshot {
-  margin: 0;
-}
-.screenshot-placeholder {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 16 / 9;
-  padding: 1rem;
-  border: 1px solid var(--mu-muted-border-color);
-  border-radius: var(--mu-border-radius);
-  background: var(--mu-card-background-color);
-  color: var(--mu-color);
-  font-size: clamp(1.25rem, 4vw, 2rem);
-}
-.screenshot img {
-  width: 100%;
-  height: auto;
-  border-radius: var(--mu-border-radius);
-}
-.video-player {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: 0;
-  border-radius: var(--mu-border-radius);
-  margin-bottom: 1rem;
-}
-.store-badges {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1rem;
-}
-.store-badges img {
-  display: block;
-  width: auto;
-  height: 48px;
-  max-width: 100%;
-  object-fit: contain;
-}
-.store-badges .google-play-badge {
-  height: 72px;
-}
-.steam-badge {
-  display: inline-flex;
-  padding: 12px 20px;
-  border-radius: 0.4rem;
-  background: #171a21;
-}
-.steam-badge img {
-  height: 36px;
 }
 .site-footer {
   border-top: 1px solid var(--mu-muted-border-color);
@@ -818,8 +869,7 @@ h3 {
     gap: 2rem;
     padding-block: 3.5rem;
   }
-  .features,
-  .install {
+  .features {
     gap: 2.5rem;
   }
 }
@@ -840,8 +890,7 @@ h3 {
     row-gap: 0.25rem;
   }
   .site-hero,
-  .features,
-  .install {
+  .features {
     grid-template-columns: 1fr;
     gap: 2.25rem;
   }
@@ -874,10 +923,6 @@ h3 {
   }
   .terminal pre {
     padding: 1rem;
-    font-size: 0.75rem;
-  }
-  .install-options pre {
-    padding: 0.8rem;
     font-size: 0.75rem;
   }
   .footer-links {
