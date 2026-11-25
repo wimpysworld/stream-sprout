@@ -101,7 +101,7 @@ When changing version:
 
 - Requires bash 5.0 or newer
 - FFmpeg must be available on PATH
-- RTMP only (no RTMPS support currently)
+- Local ingest is `rtmp://` only; outgoing destinations support `rtmp://` and `rtmps://` (when FFmpeg includes TLS support)
 - FFmpeg does not enforce stream keys (documented security limitation)
 
 ## Security Considerations
