@@ -210,3 +210,118 @@ jobs:
       channel: stable
     secrets:
       SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+
+  publish-aur:
+    needs: [build-release]
+    if: ${{ !contains(inputs.tag || github.ref_name, '-') }}
+    name: "Publish AUR 🏔️"
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: >-
+            ${{ inputs.tag != '' && format('refs/tags/{0}', inputs.tag) || '' }}
+          persist-credentials: false
+      - name: "Generate PKGBUILD and .SRCINFO 📦"
+        id: pkgbuild
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          REL_VER=$(grep '^readonly VERSION=' stream-sprout | cut -d'"' -f2)
+          TARBALL_URL="https://github.com/wimpysworld/stream-sprout/archive/refs/tags/${RELEASE_TAG}.tar.gz"
+          ARCHIVE="${RUNNER_TEMP}/stream-sprout-${REL_VER}.tar.gz"
+          curl --fail --silent --show-error --location --retry 5 \
+            --output "${ARCHIVE}" \
+            "${TARBALL_URL}"
+          TARBALL_SHA256=$(sha256sum "${ARCHIVE}" | awk '{print $1}')
+          PKGDESC="Restream a video source to multiple destinations"
+          PKGDESC+=" such as Twitch, YouTube, Owncast, and PeerTube."
+          DOC_DST="\${pkgdir}/usr/share/doc/\${pkgname}"
+          DOC_DST+="/stream-sprout.yaml.example"
+          LIC_DST="\${pkgdir}/usr/share/licenses/\${pkgname}/LICENSE"
+          STAGING_DIR="${RUNNER_TEMP}/aur-staging"
+          mkdir -p "${STAGING_DIR}"
+          cat > "${STAGING_DIR}/PKGBUILD" <<EOF
+          # Maintainer: Martin Wimpress <code@wimpress.io>
+          pkgname=stream-sprout
+          pkgver=${REL_VER}
+          pkgrel=1
+          pkgdesc="${PKGDESC}"
+          arch=('any')
+          url="https://stream-sprout.wimpys.world/"
+          license=('Apache-2.0')
+          depends=('bash' 'coreutils' 'ffmpeg' 'gawk' 'grep' 'sed')
+          source=("\${pkgname}-\${pkgver}.tar.gz::${TARBALL_URL}")
+          sha256sums=("${TARBALL_SHA256}")
+
+          package() {
+            cd "\${pkgname}-\${pkgver}"
+            install -Dm0755 stream-sprout "\${pkgdir}/usr/bin/stream-sprout"
+            install -Dm0644 stream-sprout.yaml.example "${DOC_DST}"
+            install -Dm0644 LICENSE "${LIC_DST}"
+          }
+          EOF
+          {
+            printf 'pkgbase = stream-sprout\n'
+            printf '\tpkgdesc = %s\n' "${PKGDESC}"
+            printf '\tpkgver = %s\n' "${REL_VER}"
+            printf '\tpkgrel = 1\n'
+            printf '\turl = https://stream-sprout.wimpys.world/\n'
+            printf '\tarch = any\n'
+            printf '\tlicense = Apache-2.0\n'
+            printf '\tdepends = bash\n'
+            printf '\tdepends = coreutils\n'
+            printf '\tdepends = ffmpeg\n'
+            printf '\tdepends = gawk\n'
+            printf '\tdepends = grep\n'
+            printf '\tdepends = sed\n'
+            printf '\tsource = stream-sprout-%s.tar.gz::%s\n' \
+              "${REL_VER}" "${TARBALL_URL}"
+            printf '\tsha256sums = %s\n' "${TARBALL_SHA256}"
+            printf '\npkgname = stream-sprout\n'
+          } > "${STAGING_DIR}/.SRCINFO"
+          echo "rel_ver=${REL_VER}" >> "${GITHUB_OUTPUT}"
+      - name: "Push PKGBUILD and .SRCINFO to AUR 🏔️"
+        env:
+          AUR_KEY: ${{ secrets.AUR_KEY }}
+          REL_VER: ${{ steps.pkgbuild.outputs.rel_ver }}
+        run: |
+          if [[ -z "${AUR_KEY}" ]]; then
+            echo "ERROR! AUR_KEY secret is not set."
+            exit 1
+          fi
+          AUR_KEY_FILE="${RUNNER_TEMP}/aur_key"
+          KNOWN_HOSTS_FILE="${RUNNER_TEMP}/known_hosts"
+          trap 'rm -f "${AUR_KEY_FILE}"' EXIT
+          install -m 600 /dev/null "${AUR_KEY_FILE}"
+          printf '%s\n' "${AUR_KEY}" > "${AUR_KEY_FILE}"
+          chmod 600 "${AUR_KEY_FILE}"
+          ssh-keyscan -t ed25519 aur.archlinux.org > "${KNOWN_HOSTS_FILE}"
+          if [[ ! -s "${KNOWN_HOSTS_FILE}" ]]; then
+            echo "ERROR! Failed to scan SSH host key for aur.archlinux.org."
+            exit 1
+          fi
+          GIT_SSH_COMMAND="ssh -i '${AUR_KEY_FILE}' -o IdentitiesOnly=yes"
+          GIT_SSH_COMMAND+=" -o UserKnownHostsFile='${KNOWN_HOSTS_FILE}'"
+          GIT_SSH_COMMAND+=" -o StrictHostKeyChecking=yes"
+          export GIT_SSH_COMMAND
+          AUR_DIR="${RUNNER_TEMP}/aur"
+          rm -rf "${AUR_DIR}"
+          git clone ssh://aur@aur.archlinux.org/stream-sprout.git "${AUR_DIR}"
+          cd "${AUR_DIR}"
+          git checkout -B master
+          cp \
+            "${RUNNER_TEMP}/aur-staging/PKGBUILD" \
+            "${RUNNER_TEMP}/aur-staging/.SRCINFO" \
+            .
+          git config user.name "Martin Wimpress"
+          git config user.email "code@wimpress.io"
+          git add PKGBUILD .SRCINFO
+          if git diff --cached --quiet; then
+            echo "No AUR package changes to publish."
+          else
+            git commit -m "Update to ${REL_VER}"
+            git push origin master
+          fi
