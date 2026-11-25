@@ -193,3 +193,20 @@ jobs:
           registry-password: ${{ secrets.GITHUB_TOKEN }}
       - name: Logout from Container Registry
         run: docker logout ghcr.io
+
+  publish-snap:
+    needs: [version-check]
+    if: ${{ !contains(inputs.tag || github.ref_name, '-') }}
+    name: "Publish Snap 📦"
+    permissions:
+      contents: read
+    uses: ./.github/workflows/publish-snap.yml
+    with:
+      ref: >-
+        ${{
+          inputs.tag != '' && format('refs/tags/{0}', inputs.tag)
+          || github.ref
+        }}
+      channel: stable
+    secrets:
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}

@@ -1,0 +1,101 @@
+name: Publish Snap 📦
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Git ref or tag to build"
+        type: string
+        required: false
+      channel:
+        description: "Snap Store channel to release to"
+        type: string
+        required: false
+        default: stable
+    secrets:
+      SNAPCRAFT_STORE_CREDENTIALS:
+        required: true
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref or tag to build (defaults to current branch)"
+        type: string
+        required: false
+      channel:
+        description: "Snap Store channel to release to"
+        type: choice
+        default: stable
+        options:
+          - stable
+          - candidate
+          - beta
+          - edge
+
+permissions: {}
+
+concurrency:
+  group: publish-snap-${{ inputs.ref || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish-snap:
+    name: "Publish Snap (${{ matrix.arch }}) 📦"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+    steps:
+      - name: "Checkout 🥡"
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || '' }}
+          persist-credentials: false
+      - name: "Build snap 🐊"
+        uses: snapcore/action-build@v1
+        id: snapcraft
+      - name: "Upload artefact 📤"
+        uses: actions/upload-artifact@v7
+        with:
+          name: stream-sprout-snap-${{ matrix.arch }}
+          path: ${{ steps.snapcraft.outputs.snap }}
+          retention-days: 7
+      - name: "Ensure snapcraft CLI 📦"
+        run: |
+          command -v snapcraft >/dev/null \
+            || sudo snap install snapcraft --classic
+      - name: "Upload and release snap to Store 🚀"
+        env:
+          SNAP_NAME: stream-sprout
+          SNAP_CHANNEL: ${{ inputs.channel || 'stable' }}
+          SNAP_FILE: ${{ steps.snapcraft.outputs.snap }}
+          SNAPCRAFT_STORE_CREDENTIALS: >-
+            ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: |
+          set -euo pipefail
+          upload_output=$(snapcraft upload "${SNAP_FILE}")
+          printf '%s\n' "${upload_output}"
+          revision=$(
+            printf '%s\n' "${upload_output}" \
+              | sed -nE 's/.*Revision[[:space:]]+([0-9]+).*/\1/p' \
+              | tail -n1
+          )
+          if [[ -z "${revision}" ]]; then
+            echo "Could not determine snap revision from upload output" >&2
+            exit 1
+          fi
+          snapcraft release "${SNAP_NAME}" "${revision}" "${SNAP_CHANNEL}"
+      - name: "Show Snap Store revisions 🔎"
+        continue-on-error: true
+        env:
+          SNAP_NAME: stream-sprout
+          SNAP_ARCH: ${{ matrix.arch }}
+          SNAPCRAFT_STORE_CREDENTIALS: >-
+            ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: snapcraft revisions "${SNAP_NAME}" --arch "${SNAP_ARCH}"

@@ -22,11 +22,11 @@ parts:
     after: [ deps ]
     plugin: dump
     source: .
-    build-packages:
-      - git
     override-pull: |
       craftctl default
-      craftctl set version=$(grep "^readonly VERSION" stream-sprout | cut -d'"' -f2)-$(git rev-parse --short HEAD)
+      craftctl set version="$(
+        grep '^readonly VERSION=' stream-sprout | cut -d'"' -f2
+      )"
     prime:
       - stream-sprout
       - stream-sprout.yaml.example
