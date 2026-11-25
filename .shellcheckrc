@@ -1,0 +1,8 @@
+# Keep the default checks and infer the dialect from each script.
+# Supply sourced files explicitly, or use -x in a project-specific hook.
+
+# Add only after checking that runtime source paths are script-relative:
+# source-path=SCRIPTDIR
+
+# Enable only after reviewing intentional conditional function calls:
+# enable=check-set-e-suppressed

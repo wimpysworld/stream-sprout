@@ -2,17 +2,16 @@
 
 ## Supported Versions
 
-Here are the versions of Stream Sprout currently being supported with security updates.
-
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.1.x   | :white_check_mark: |
-| < 0.0   | :x:                |
+Only the latest release is supported. Security fixes are released as patch versions.
 
 ## Reporting a Vulnerability
 
-If you discover a vulnerability then [file an issue](https://github.com/wimpysworld/stream-sprout/issues/new) and click *Report a vulnerability*.
+**Do not open a public issue for security vulnerabilities.**
 
-- Stream Sprout is a spare-time hobby project.
-- We do not have SLAs for responding to security issues.
-- It is a best-efforts basis.
+[Report vulnerabilities privately](https://github.com/wimpysworld/stream-sprout/security/advisories/new). Include:
+
+- Steps to reproduce
+- Affected versions
+- Potential impact
+
+This project is maintained on a best-efforts basis. There are no guaranteed response times for security reports.

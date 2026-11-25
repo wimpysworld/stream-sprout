@@ -136,7 +136,7 @@ docker run -p 1935:1935 -it -v $PWD:/data ghcr.io/wimpysworld/stream-sprout:alpi
 Build the Stream Sprout container image:
 
 ```shell
-docker build -t stream-sprout .
+docker build -f Containerfile -t stream-sprout .
 ```
 
 ### From source

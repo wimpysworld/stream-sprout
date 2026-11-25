@@ -1,13 +1,13 @@
-{ lib
-, installShellFiles
-, makeWrapper
-, stdenv
-, coreutils-full
-, ffmpeg-headless
-, gawk
-, gnugrep
-, gnused
-, procps
+{
+  lib,
+  installShellFiles,
+  makeWrapper,
+  stdenv,
+  coreutils-full,
+  ffmpeg-headless,
+  gawk,
+  gnugrep,
+  gnused,
 }:
 let
   runtimePaths = [
@@ -22,14 +22,17 @@ let
       .*
       readonly[[:blank:]]VERSION="([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)"
       .*
-    '' (builtins.readFile ./stream-sprout);
+    '' (builtins.readFile ../stream-sprout);
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "stream-sprout";
   version = builtins.concatStringsSep "" versionMatches;
-  src = lib.cleanSource ./.;
+  src = lib.cleanSource ../.;
 
-  nativeBuildInputs = [ makeWrapper installShellFiles ];
+  nativeBuildInputs = [
+    makeWrapper
+    installShellFiles
+  ];
 
   installPhase = ''
     runHook preInstall

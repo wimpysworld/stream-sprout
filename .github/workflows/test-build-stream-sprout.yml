@@ -9,7 +9,7 @@ on:
       - stream-sprout
       - debian/**
       - flake.nix
-      - package.nix
+      - nix/package.nix
       - Containerfile
       - snap/snapcraft.yaml
   push:
@@ -20,7 +20,7 @@ on:
       - stream-sprout
       - debian/**
       - flake.nix
-      - package.nix
+      - nix/package.nix
       - Containerfile
       - snap/snapcraft.yaml
   workflow_dispatch:
@@ -46,7 +46,7 @@ jobs:
         rm debian/changelog
         dch --package stream-sprout --newversion="${REL_VER}-1" --distribution=unstable "New upstream release." --create
         dpkg-buildpackage --build=binary --no-check-builddeps --compression=gzip
-        sudo apt-get -y install ../stream-sprout_${REL_VER}-1_all.deb
+        sudo apt-get -y install "../stream-sprout_${REL_VER}-1_all.deb"
 
   test-nix-build:
     runs-on: ubuntu-24.04
@@ -84,7 +84,7 @@ jobs:
         id: get_version
         run: |
           STREAM_SPROUT_VER=$(grep "^readonly VERSION" stream-sprout | cut -d'"' -f2)
-          echo "STREAM_SPROUT_VER=$STREAM_SPROUT_VER" >> $GITHUB_ENV
+          echo "STREAM_SPROUT_VER=$STREAM_SPROUT_VER" >> "$GITHUB_ENV"
       - name: "Build Container 🐋"
         uses: docker/build-push-action@v7
         with:

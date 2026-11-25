@@ -30,7 +30,7 @@ nix build
 nix develop
 
 # Docker build and run
-docker build -t stream-sprout .
+docker build -f Containerfile -t stream-sprout .
 docker run -p 1935:1935 -it -v $PWD:/data stream-sprout --config /data/stream-sprout.yaml
 ```
 
@@ -63,7 +63,7 @@ stream-sprout.yaml.example  # Example configuration
 package.nix             # Nix package definition
 devshell.nix            # Nix development shell
 flake.nix               # Nix flake
-Dockerfile              # Alpine-based container
+Containerfile           # Alpine-based container
 ```
 
 ## Configuration

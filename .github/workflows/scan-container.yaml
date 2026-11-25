@@ -26,10 +26,11 @@ jobs:
           load: true
 
       - name: Scan image
+        id: scan
         uses: anchore/scan-action@v7
         with:
           image: "localbuild/testimage:latest"
           output-format: table
 
       - name: Inspect action report
-        run: cat ${{ steps.scan.outputs.table }}
+        run: cat "${{ steps.scan.outputs.table }}"
