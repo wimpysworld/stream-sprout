@@ -414,38 +414,15 @@ h3 {
 .terminal-dots i:nth-child(3) {
   background: var(--mu-primary);
 }
-.terminal pre {
-  background: transparent;
-  padding: 1.35rem 1.5rem;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  font-size: 0.85rem;
-  line-height: 1.75;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+.terminal picture {
+  display: block;
+  padding: 0.5rem 0.65rem;
+  background: #1e1e2e;
 }
-.terminal code {
-  color: var(--mu-color);
-  padding: 0;
-  background: transparent;
-}
-.terminal-comment {
-  color: var(--mu-muted-color);
-}
-.prompt {
-  color: var(--mu-muted-color);
-  user-select: none;
-}
-.terminal-command,
-.terminal-brand,
-.terminal-status {
-  color: var(--mu-primary);
-  font-weight: 600;
-}
-.terminal-accent {
-  color: var(--mu-warning);
-  font-weight: 600;
+.terminal-demo {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 .section-rule {
   border-top: 1px solid var(--mu-muted-border-color);
@@ -920,10 +897,6 @@ a.install-tile:is(:hover, :focus-visible) > .arrow-up-right {
   .site-hero-actions {
     align-items: flex-start;
     gap: 1rem;
-  }
-  .terminal pre {
-    padding: 1rem;
-    font-size: 0.75rem;
   }
   .footer-links {
     grid-template-columns: repeat(2, 1fr);
