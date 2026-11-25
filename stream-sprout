@@ -5,7 +5,7 @@
 stty -echoctl
 
 readonly STREAM_SPROUT_YAML="stream-sprout.yaml"
-readonly VERSION="0.1.6"
+readonly VERSION="0.1.7"
 
 STATUS_INTERVAL="${STREAM_SPROUT_STATUS_INTERVAL:-30}"
 if [[ ! "${STATUS_INTERVAL}" =~ ^[1-9][0-9]*$ ]]; then
