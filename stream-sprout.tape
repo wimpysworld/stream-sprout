@@ -5,6 +5,7 @@ Output .demo.mp4
 Set Shell "/bin/sh"
 Set Columns 74
 Set Rows 26
+Set FontFamily "Fira Code"
 Set FontSize 18
 Set Padding 16
 Set Framerate 20

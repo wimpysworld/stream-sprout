@@ -14,7 +14,7 @@
 Stream Sprout receives a single RTMP stream from [OBS Studio](https://obsproject.com/) (or any RTMP encoder) through [FFmpeg](https://ffmpeg.org/) and forwards it to multiple destinations without transcoding. It runs beside OBS Studio on Linux or macOS without root privileges, third-party relay fees, or a separate web server.
 
 <div align="center">
-  <img src="pages/demo.webp" alt="Stream Sprout terminal output during a multi-destination broadcast" width="846" height="578">
+  <img src="pages/demo.webp" alt="Stream Sprout terminal output during a multi-destination broadcast" width="846" height="630">
 </div>
 
 ## Features

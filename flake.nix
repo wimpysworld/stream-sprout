@@ -51,24 +51,40 @@
         system:
         let
           pkgs = import nixpkgs { inherit system; };
+          firaCode = pkgs.fira-code.override { useVariableFont = false; };
+          fontPath = "${firaCode}/share/fonts/truetype:${pkgs.dejavu_fonts}/share/fonts/truetype";
+          ntrecordRaw = pkgs.callPackage ./nix/ntrecord.nix { };
+          ntrecord = pkgs.symlinkJoin {
+            name = ntrecordRaw.name;
+            paths = [ ntrecordRaw ];
+            nativeBuildInputs = [ pkgs.makeWrapper ];
+            postBuild = ''
+              wrapProgram "$out/bin/ntrecord" \
+                --set XDG_DATA_HOME "${firaCode}/share" \
+                --set-default NTRECORD_FONT_PATH "${fontPath}"
+            '';
+          };
           tailorPkgs = tailor.packages.${system} or { };
         in
         {
           default = pkgs.mkShell {
+            NTRECORD_FONT_PATH = fontPath;
             shellHook = import ./nix/hooks.nix { inherit pkgs; };
             packages =
               with pkgs;
               [
                 actionlint
                 coreutils-full
+                dejavu_fonts
                 ffmpeg-headless
+                firaCode
                 gawk
                 gh
                 gnugrep
                 gnused
                 just
+                ntrecord
               ]
-              ++ [ (pkgs.callPackage ./nix/ntrecord.nix { }) ]
               ++ (if tailorPkgs ? tailor then [ tailorPkgs.tailor ] else [ ])
               ++ import ./nix/loader.nix { inherit pkgs; };
           };
