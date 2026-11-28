@@ -1,21 +1,24 @@
-<h1 align="center">
-  <img src="pages/icon.png" width="256" height="256" alt="Stream Sprout">
-  <br />
-  Stream Sprout
-</h1>
-
-<p align="center"><b>Restream one video source to Twitch, YouTube, Owncast, PeerTube, and other platforms at the same time.</b></p>
-
+<!-- tailor:social-header:start -->
 <p align="center">
-  <a href="https://stream-sprout.wimpys.world/">Website</a> |
-  <a href="https://github.com/wimpysworld/stream-sprout/wiki">Documentation</a>
+  <a href="https://stream-sprout.wimpys.world"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/hero-dark.svg"><img src="pages/social/hero-light.svg" alt="Stream Sprout"></picture></a>
 </p>
+<!-- tailor:social-header:end -->
+
+<!-- tailor:social-links:start -->
+<p align="center">
+  <a href="https://bsky.app/profile/wimpys.world"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/link-bluesky-dark.svg"><img src="pages/social/link-bluesky-light.svg" alt="Bluesky"></picture></a>
+  <a href="https://wimpysworld.social/@martin"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/link-mastodon-dark.svg"><img src="pages/social/link-mastodon-light.svg" alt="Mastodon"></picture></a>
+  <a href="https://linkedin.com/in/martinwimpress"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/link-linkedin-dark.svg"><img src="pages/social/link-linkedin-light.svg" alt="LinkedIn"></picture></a>
+</p>
+<!-- tailor:social-links:end -->
+
+<!-- tailor:social-community:start -->
+<p align="center">
+  <a href="https://discord.com/invite/vUsydfP"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/wimpysworld/stream-sprout/social-assets/community-dark.svg"><img src="https://raw.githubusercontent.com/wimpysworld/stream-sprout/social-assets/community-light.svg" alt="Discord community"></picture></a>
+</p>
+<!-- tailor:social-community:end -->
 
 Stream Sprout receives a single RTMP stream from [OBS Studio](https://obsproject.com/) (or any RTMP encoder) through [FFmpeg](https://ffmpeg.org/) and forwards it to multiple destinations without transcoding. It runs beside OBS Studio on Linux or macOS without root privileges, third-party relay fees, or a separate web server.
-
-<div align="center">
-  <img src="pages/demo.webp" alt="Stream Sprout terminal output during a multi-destination broadcast" width="846" height="630">
-</div>
 
 ## Features
 
@@ -25,19 +28,29 @@ Stream Sprout receives a single RTMP stream from [OBS Studio](https://obsproject
 - Save an optional local Matroska (`.mkv`) archive of each broadcast with a timestamped filename.
 - Manage all server and destination settings in one `stream-sprout.yaml` file that reloads between broadcasts.
 
+<!-- tailor:social-stats:start -->
+<p align="center">
+  <a href="https://github.com/wimpysworld/stream-sprout/pulse"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/wimpysworld/stream-sprout/social-assets/stats-dark.svg"><img src="https://raw.githubusercontent.com/wimpysworld/stream-sprout/social-assets/stats-light.svg" alt="Stream Sprout statistics"></picture></a>
+</p>
+<!-- tailor:social-stats:end -->
+
 ## Install
 
-| | Platform | Repository |
-| :-: | --- | --- |
-| <img src="https://apt.wimpys.world/logo.svg" width="32" height="32" alt=""> | Debian and Ubuntu | [apt.wimpys.world](https://apt.wimpys.world/#stream-sprout) |
-| <img src="https://rpm.wimpys.world/logo.svg" width="32" height="32" alt=""> | Fedora and openSUSE | [rpm.wimpys.world](https://rpm.wimpys.world/#stream-sprout) |
-| <img src="https://pkg.wimpys.world/logo.svg" width="32" height="32" alt=""> | Arch Linux | [pkg.wimpys.world](https://pkg.wimpys.world/#stream-sprout) |
-| <img src="https://apk.wimpys.world/logo.svg" width="32" height="32" alt=""> | Alpine Linux | [apk.wimpys.world](https://apk.wimpys.world/#stream-sprout) |
-| <img src="https://nix.wimpys.world/logo.svg" width="32" height="32" alt=""> | Nix and NixOS | [nix.wimpys.world](https://nix.wimpys.world/#stream-sprout) |
+First-party signed package repositories are published for Linux and Nix through [wimpys.world](https://wimpys.world/). Choose your platform below for setup instructions and automatic updates.
 
-Each repository is signed, and its page gives the setup steps and keeps Stream Sprout up to date.
+<!-- tailor:social-packages:start -->
+<p align="center">
+  <a href="https://apt.wimpys.world/#stream-sprout"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/pkg-apt-dark.svg"><img src="pages/social/pkg-apt-light.svg" alt="Debian and Ubuntu"></picture></a>
+  <a href="https://rpm.wimpys.world/#stream-sprout"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/pkg-rpm-dark.svg"><img src="pages/social/pkg-rpm-light.svg" alt="Fedora and openSUSE"></picture></a>
+  <a href="https://pkg.wimpys.world/#stream-sprout"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/pkg-pkg-dark.svg"><img src="pages/social/pkg-pkg-light.svg" alt="Arch Linux"></picture></a>
+  <br>
+  <a href="https://apk.wimpys.world/#stream-sprout"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/pkg-apk-dark.svg"><img src="pages/social/pkg-apk-light.svg" alt="Alpine Linux"></picture></a>
+  <a href="https://nix.wimpys.world/#stream-sprout"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/pkg-nix-dark.svg"><img src="pages/social/pkg-nix-light.svg" alt="Nix and NixOS"></picture></a>
+</p>
+<!-- tailor:social-packages:end -->
 
-### Container
+<details>
+<summary><strong>Container (GHCR)</strong> - run <code>ghcr.io/wimpysworld/stream-sprout:latest-alpine</code> on <code>linux/amd64</code> and <code>linux/arm64</code></summary>
 
 Images are published to the GitHub Container Registry for `linux/amd64` and `linux/arm64`.
 
@@ -65,7 +78,10 @@ Build the container image locally:
 docker build -f Containerfile -t stream-sprout .
 ```
 
-### From source
+</details>
+
+<details>
+<summary><strong>From source</strong> - run directly with Bash 5.0 or later and FFmpeg</summary>
 
 Stream Sprout requires Bash 5.0 or later and [FFmpeg](https://ffmpeg.org/) on `PATH`.
 
@@ -74,7 +90,15 @@ git clone https://github.com/wimpysworld/stream-sprout.git
 cd stream-sprout
 ```
 
-## Usage
+</details>
+
+<!-- tailor:social-sponsors:start -->
+<p align="center">
+  <a href="https://github.com/sponsors/flexiondotorg"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/sponsors-dark.svg"><img src="pages/social/sponsors-light.svg" alt="Stream Sprout sponsors"></picture></a>
+</p>
+<!-- tailor:social-sponsors:end -->
+
+## Quick start
 
 Create `stream-sprout.yaml` in your working directory (or copy [`stream-sprout.yaml.example`](stream-sprout.yaml.example)):
 
@@ -106,6 +130,12 @@ stream-sprout
 
 In OBS Studio, open `Settings` > `Stream`, choose `Custom`, enter `rtmp://127.0.0.1:1935/sprout` as the `Server`, paste your `server.key` value into `Stream Key`, and click **Start Streaming**. Press <kbd>Ctrl</kbd>+<kbd>C</kbd> in the terminal to stop `stream-sprout`.
 
+<!-- tailor:social-demo:start -->
+<p align="center">
+  <img src="pages/demo.webp" alt="Stream Sprout demo">
+</p>
+<!-- tailor:social-demo:end -->
+
 | Option | Description |
 | --- | --- |
 | `--config <path>` | Load a configuration file from a custom path. |
@@ -122,3 +152,25 @@ In OBS Studio, open `Settings` > `Stream`, choose `Custom`, enter `rtmp://127.0.
 - [OBS Studio](https://github.com/wimpysworld/stream-sprout/wiki/OBS-Studio) - OBS Studio setup walkthrough and remote-host connection notes.
 - [Security and limitations](https://github.com/wimpysworld/stream-sprout/wiki/Security-and-Limitations) - FFmpeg RTMP key enforcement caveat, VPN, SSH tunnel, and firewall hardening, and upload bandwidth limits.
 - [References](https://github.com/wimpysworld/stream-sprout/wiki/References) - Upstream FFmpeg, OBS Studio, and container references plus `stream-sprout --info` bug-report guidance.
+
+## Support and contributing
+
+Read [Support](SUPPORT.md) for help and [Contributing](CONTRIBUTING.md) before submitting a change.
+
+<!-- tailor:social-stars:start -->
+<p align="center">
+  <a href="https://github.com/wimpysworld/stream-sprout/stargazers"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/wimpysworld/stream-sprout/social-assets/stars-dark.svg"><img src="https://raw.githubusercontent.com/wimpysworld/stream-sprout/social-assets/stars-light.svg" alt="Stream Sprout star history"></picture></a>
+</p>
+<!-- tailor:social-stars:end -->
+
+<!-- tailor:social-contributors:start -->
+<p align="center">
+  <a href="https://github.com/wimpysworld/stream-sprout/graphs/contributors"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/wimpysworld/stream-sprout/social-assets/contributors-dark.svg"><img src="https://raw.githubusercontent.com/wimpysworld/stream-sprout/social-assets/contributors-light.svg" alt="Stream Sprout contributors"></picture></a>
+</p>
+<!-- tailor:social-contributors:end -->
+
+<!-- tailor:social-footer:start -->
+<p align="center">
+  <a href="https://tailor.wimpys.world"><picture><source media="(prefers-color-scheme: dark)" srcset="pages/social/footer-dark.svg"><img src="pages/social/footer-light.svg" alt="Fitted by Tailor"></picture></a>
+</p>
+<!-- tailor:social-footer:end -->

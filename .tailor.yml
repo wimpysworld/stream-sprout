@@ -167,6 +167,39 @@ pages:
   #   website: https://example.com
   #   email: hello@example.com
 
+social:
+  enabled: true
+  theme: dark
+  og:
+    output: pages/og.png
+    include_preview: true
+    image: pages/demo-still.png
+  readme:
+    header: true
+    preferred_links:
+      - bluesky
+      - mastodon
+      - linkedin
+    community: auto
+    packages:
+      - apt
+      - rpm
+      - pkg
+      - apk
+      - nix
+    stats: true
+    star_history:
+      enabled: true
+      min_stars: 25
+      min_days: 30
+    sponsors: auto
+    contributors: true
+    demo: true
+    footer: true
+  live:
+    branch: social-assets
+    schedule: "0 4 * * *"
+
 labels:
   - name: bug
     color: d20f39
