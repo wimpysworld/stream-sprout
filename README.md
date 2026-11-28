@@ -132,7 +132,7 @@ In OBS Studio, open `Settings` > `Stream`, choose `Custom`, enter `rtmp://127.0.
 
 <!-- tailor:social-demo:start -->
 <p align="center">
-  <img src="pages/demo.webp" alt="Stream Sprout demo">
+  <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/wimpysworld/stream-sprout/social-assets/demo-dark.svg"><img src="https://raw.githubusercontent.com/wimpysworld/stream-sprout/social-assets/demo-light.svg" alt="Stream Sprout demo"></picture>
 </p>
 <!-- tailor:social-demo:end -->
 
